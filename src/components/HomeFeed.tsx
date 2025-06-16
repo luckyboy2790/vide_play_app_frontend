@@ -58,7 +58,7 @@ const HomeFeed = () => {
   const currentPlay = plays[currentIndex];
 
   return (
-    <div className="relative h-[calc(100vh-140px)] overflow-hidden bg-black">
+    <div className="relative h-screen overflow-hidden bg-black">
       {/* Full Screen Play Card */}
       <div className="absolute inset-0">
         {/* Video Background */}
@@ -73,7 +73,7 @@ const HomeFeed = () => {
         </div>
 
         {/* Right Side Actions */}
-        <div className="absolute right-4 bottom-24 flex flex-col items-center space-y-6">
+        <div className="absolute right-4 bottom-32 flex flex-col items-center space-y-6">
           {/* Profile Avatar */}
           <div className="relative">
             <div className="w-12 h-12 bg-gray-600 rounded-full flex items-center justify-center border-2 border-white">
@@ -132,7 +132,7 @@ const HomeFeed = () => {
         </div>
 
         {/* Bottom Info Overlay */}
-        <div className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black/80 to-transparent">
+        <div className="absolute bottom-20 left-0 right-0 p-4 bg-gradient-to-t from-black/80 to-transparent">
           <div className="mb-4">
             <div className="flex items-center mb-2">
               <span className="text-white font-semibold text-lg">@coach_highlights</span>
@@ -179,11 +179,11 @@ const HomeFeed = () => {
 
       {/* Touch Swipe Areas */}
       <div
-        className="absolute top-0 left-0 right-0 h-1/2 cursor-pointer z-10"
+        className="absolute top-16 left-0 right-0 h-1/2 cursor-pointer z-10"
         onClick={() => handleSwipe('down')}
       />
       <div
-        className="absolute bottom-0 left-0 right-0 h-1/2 cursor-pointer z-10"
+        className="absolute bottom-20 left-0 right-0 h-1/2 cursor-pointer z-10"
         onClick={() => handleSwipe('up')}
       />
     </div>

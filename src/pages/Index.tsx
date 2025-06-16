@@ -25,7 +25,7 @@ const Index = () => {
   };
 
   return (
-    <div className="min-h-screen bg-black">
+    <div className="min-h-screen bg-black max-w-sm mx-auto relative">
       {/* Header with TikTok-style tabs */}
       {activeTab === 'home' && (
         <header className="absolute top-0 left-0 right-0 z-20 px-4 py-3 bg-transparent">
@@ -51,17 +51,17 @@ const Index = () => {
       )}
 
       {/* Main Content */}
-      <main className={activeTab === 'home' ? '' : 'pb-20'}>
+      <main className={activeTab === 'home' ? 'h-screen' : 'pb-20'}>
         {renderContent()}
       </main>
 
       {/* Bottom Navigation */}
-      <nav className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 px-4 py-2">
-        <div className="flex justify-around items-center max-w-md mx-auto">
+      <nav className="fixed bottom-0 left-1/2 transform -translate-x-1/2 w-full max-w-sm bg-black border-t border-gray-800">
+        <div className="flex justify-around items-center py-2">
           <button
             onClick={() => setActiveTab('home')}
-            className={`flex flex-col items-center p-2 rounded-lg transition-colors ${
-              activeTab === 'home' ? 'text-green-700 bg-green-50' : 'text-gray-500'
+            className={`flex flex-col items-center p-2 transition-colors ${
+              activeTab === 'home' ? 'text-white' : 'text-gray-400'
             }`}
           >
             <Home size={24} />
@@ -70,8 +70,8 @@ const Index = () => {
           
           <button
             onClick={() => setActiveTab('playbook')}
-            className={`flex flex-col items-center p-2 rounded-lg transition-colors ${
-              activeTab === 'playbook' ? 'text-green-700 bg-green-50' : 'text-gray-500'
+            className={`flex flex-col items-center p-2 transition-colors ${
+              activeTab === 'playbook' ? 'text-white' : 'text-gray-400'
             }`}
           >
             <BookOpen size={24} />
@@ -80,8 +80,8 @@ const Index = () => {
           
           <button
             onClick={() => setActiveTab('search')}
-            className={`flex flex-col items-center p-2 rounded-lg transition-colors ${
-              activeTab === 'search' ? 'text-green-700 bg-green-50' : 'text-gray-500'
+            className={`flex flex-col items-center p-2 transition-colors ${
+              activeTab === 'search' ? 'text-white' : 'text-gray-400'
             }`}
           >
             <Search size={24} />
@@ -90,8 +90,8 @@ const Index = () => {
           
           <button
             onClick={() => setActiveTab('profile')}
-            className={`flex flex-col items-center p-2 rounded-lg transition-colors ${
-              activeTab === 'profile' ? 'text-green-700 bg-green-50' : 'text-gray-500'
+            className={`flex flex-col items-center p-2 transition-colors ${
+              activeTab === 'profile' ? 'text-white' : 'text-gray-400'
             }`}
           >
             <User size={24} />
