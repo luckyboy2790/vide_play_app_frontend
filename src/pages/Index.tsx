@@ -26,19 +26,6 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-black max-w-sm mx-auto relative">
-      {/* Header with TikTok-style tabs */}
-      {activeTab === 'home' && (
-        <header className="absolute top-0 left-0 right-0 z-20 px-4 py-3 bg-transparent">
-          <div className="flex justify-center items-center space-x-8">
-            <button className="text-white/70 font-medium text-lg">Following</button>
-            <button className="text-white font-bold text-lg border-b-2 border-white pb-1">
-              For You
-            </button>
-            <button className="text-white/70 font-medium text-lg">LIVE</button>
-          </div>
-        </header>
-      )}
-
       {/* Header for other tabs */}
       {activeTab !== 'home' && (
         <header className="bg-white border-b border-gray-200 px-4 py-3 sticky top-0 z-10">
