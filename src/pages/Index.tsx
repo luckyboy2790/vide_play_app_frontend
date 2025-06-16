@@ -1,12 +1,90 @@
-// Update this page (the content is just a fallback if you fail to update the page)
+
+import { useState } from 'react';
+import { Home, BookOpen, Search, User } from 'lucide-react';
+import HomeFeed from '@/components/HomeFeed';
+import Playbook from '@/components/Playbook';
+import SearchPage from '@/components/SearchPage';
+import ProfilePage from '@/components/ProfilePage';
 
 const Index = () => {
+  const [activeTab, setActiveTab] = useState('home');
+
+  const renderContent = () => {
+    switch (activeTab) {
+      case 'home':
+        return <HomeFeed />;
+      case 'playbook':
+        return <Playbook />;
+      case 'search':
+        return <SearchPage />;
+      case 'profile':
+        return <ProfilePage />;
+      default:
+        return <HomeFeed />;
+    }
+  };
+
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background">
-      <div className="text-center">
-        <h1 className="text-4xl font-bold mb-4">Welcome to Your Blank App</h1>
-        <p className="text-xl text-muted-foreground">Start building your amazing project here!</p>
-      </div>
+    <div className="min-h-screen bg-white">
+      {/* Header */}
+      <header className="bg-white border-b border-gray-200 px-4 py-3 sticky top-0 z-10">
+        <h1 className="text-2xl font-bold text-gray-900">
+          {activeTab === 'home' && '1st & 10'}
+          {activeTab === 'playbook' && 'My Playbook'}
+          {activeTab === 'search' && 'Search Plays'}
+          {activeTab === 'profile' && 'Profile'}
+        </h1>
+      </header>
+
+      {/* Main Content */}
+      <main className="pb-20">
+        {renderContent()}
+      </main>
+
+      {/* Bottom Navigation */}
+      <nav className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 px-4 py-2">
+        <div className="flex justify-around items-center max-w-md mx-auto">
+          <button
+            onClick={() => setActiveTab('home')}
+            className={`flex flex-col items-center p-2 rounded-lg transition-colors ${
+              activeTab === 'home' ? 'text-green-700 bg-green-50' : 'text-gray-500'
+            }`}
+          >
+            <Home size={24} />
+            <span className="text-xs mt-1">Home</span>
+          </button>
+          
+          <button
+            onClick={() => setActiveTab('playbook')}
+            className={`flex flex-col items-center p-2 rounded-lg transition-colors ${
+              activeTab === 'playbook' ? 'text-green-700 bg-green-50' : 'text-gray-500'
+            }`}
+          >
+            <BookOpen size={24} />
+            <span className="text-xs mt-1">Playbook</span>
+          </button>
+          
+          <button
+            onClick={() => setActiveTab('search')}
+            className={`flex flex-col items-center p-2 rounded-lg transition-colors ${
+              activeTab === 'search' ? 'text-green-700 bg-green-50' : 'text-gray-500'
+            }`}
+          >
+            <Search size={24} />
+            <span className="text-xs mt-1">Search</span>
+          </button>
+          
+          <button
+            onClick={() => setActiveTab('profile')}
+            className={`flex flex-col items-center p-2 rounded-lg transition-colors ${
+              activeTab === 'profile' ? 'text-green-700 bg-green-50' : 'text-gray-500'
+            }`}
+          >
+            <User size={24} />
+            <span className="text-xs mt-1">Profile</span>
+          </button>
+        </div>
+      </nav>
     </div>
   );
 };
