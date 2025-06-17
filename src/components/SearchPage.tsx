@@ -9,7 +9,7 @@ const SearchPage = () => {
   const [searchQuery, setSearchQuery] = useState('');
 
   return (
-    <div className="h-full flex flex-col px-4 overflow-hidden relative bg-green-700">
+    <div className="h-full flex flex-col px-4 overflow-hidden relative" style={{ backgroundColor: '#2d5a3d' }}>
       {/* Floating Search Bar */}
       <div className="px-4 py-4 relative z-10">
         <div className="relative max-w-md mx-auto">
