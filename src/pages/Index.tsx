@@ -47,14 +47,9 @@ const Index = () => {
   };
 
   return (
-    <div className="min-h-screen bg-green-800 max-w-sm mx-auto relative" style={{ backgroundColor: '#1a4d3a' }}>
-      {/* Chalkboard texture overlay */}
-      <div className="absolute inset-0 opacity-20" style={{ 
-        backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")` 
-      }}></div>
-
+    <div className="min-h-screen bg-green-800 max-w-sm mx-auto" style={{ backgroundColor: '#1a4d3a' }}>
       {/* Top Navigation - Chalkboard style */}
-      <nav className="bg-green-900 border-b-2 border-white relative sticky top-0 z-10">
+      <nav className="bg-green-900 border-b-2 border-white relative">
         {/* Chalk dust effect */}
         <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-white to-transparent opacity-60"></div>
         
@@ -122,6 +117,11 @@ const Index = () => {
         </div>
       </nav>
 
+      {/* Chalkboard texture overlay */}
+      <div className="absolute inset-0 opacity-20 pointer-events-none" style={{ 
+        backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")` 
+      }}></div>
+
       {/* Header for non-home tabs */}
       {activeTab !== 'home' && (
         <header className="bg-green-900 border-b-2 border-white px-4 py-3 relative">
@@ -138,7 +138,7 @@ const Index = () => {
       )}
 
       {/* Main Content */}
-      <main className="pb-4">
+      <main className="pb-4 relative">
         {renderContent()}
       </main>
     </div>
