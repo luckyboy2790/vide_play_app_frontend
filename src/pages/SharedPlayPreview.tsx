@@ -1,11 +1,10 @@
-
 import { useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { ArrowLeft, Save } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
-import { Play } from '@/types/play';
+import { supabase } from '@/integrations/supabase/client';
 
 const SharedPlayPreview = () => {
   const navigate = useNavigate();
@@ -38,41 +37,62 @@ const SharedPlayPreview = () => {
 
     setIsLoading(true);
 
-    const newPlay: Play = {
-      id: `shared_${Date.now()}`,
-      video_url: videoUrl,
-      caption: caption,
-      play_type: playType,
-      formation: '', // Will be auto-detected
-      tags: [], // Will be auto-detected
-      shared_by: 'current_user', // Replace with actual user ID
-      created_at: new Date().toISOString(),
-      likes: 0,
-      liked: false,
-      saved: true,
-      source: platform,
-      description: caption,
-    };
+    try {
+      // Get current user
+      const { data: { user } } = await supabase.auth.getUser();
+      
+      if (!user) {
+        toast({
+          title: "Authentication required",
+          description: "Please log in to save plays.",
+          variant: "destructive",
+        });
+        setIsLoading(false);
+        return;
+      }
 
-    // Save to localStorage (mock database)
-    const existingPlays = JSON.parse(localStorage.getItem('allPlays') || '[]');
-    const updatedPlays = [newPlay, ...existingPlays];
-    localStorage.setItem('allPlays', JSON.stringify(updatedPlays));
+      // Insert into Supabase plays table
+      const { error } = await supabase
+        .from('plays')
+        .insert({
+          video_url: videoUrl,
+          caption: caption,
+          play_type: playType,
+          formation: null,
+          tags: [],
+          thumbnail_url: null,
+          shared_by: platform,
+          user_id: user.id
+        });
 
-    // Also add to saved plays
-    const savedPlays = JSON.parse(localStorage.getItem('savedPlays') || '[]');
-    savedPlays.push(newPlay);
-    localStorage.setItem('savedPlays', JSON.stringify(savedPlays));
+      if (error) {
+        console.error('Error saving play:', error);
+        toast({
+          title: "Error saving play",
+          description: "There was an error saving your play. Please try again.",
+          variant: "destructive",
+        });
+        setIsLoading(false);
+        return;
+      }
 
-    setIsLoading(false);
+      toast({
+        title: "Play saved!",
+        description: "AI is analyzing formation and tags.",
+      });
 
-    toast({
-      title: "Play saved!",
-      description: "We're analyzing it to auto-detect formation and tags.",
-    });
-
-    // Navigate back to home
-    navigate('/');
+      // Navigate back to home
+      navigate('/');
+    } catch (error) {
+      console.error('Unexpected error:', error);
+      toast({
+        title: "Error saving play",
+        description: "There was an unexpected error. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (

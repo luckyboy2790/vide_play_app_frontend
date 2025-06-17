@@ -15,9 +15,11 @@ export type Database = {
           created_at: string
           formation: string
           id: number
+          play_type: string | null
           shared_by: string | null
           tags: string[]
           thumbnail_url: string
+          user_id: string | null
           video_url: string
         }
         Insert: {
@@ -25,9 +27,11 @@ export type Database = {
           created_at?: string
           formation: string
           id?: number
+          play_type?: string | null
           shared_by?: string | null
           tags: string[]
           thumbnail_url: string
+          user_id?: string | null
           video_url: string
         }
         Update: {
@@ -35,9 +39,11 @@ export type Database = {
           created_at?: string
           formation?: string
           id?: number
+          play_type?: string | null
           shared_by?: string | null
           tags?: string[]
           thumbnail_url?: string
+          user_id?: string | null
           video_url?: string
         }
         Relationships: []
