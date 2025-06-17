@@ -23,10 +23,14 @@ const SharedPlayPreview = () => {
   const [isLoading, setIsLoading] = useState(false);
 
   const playTypes = [
-    { value: 'pass', label: 'Pass' },
-    { value: 'run', label: 'Run' },
-    { value: 'trick', label: 'Trick' },
-    { value: 'rpo', label: 'RPO' },
+    { value: 'inside-run', label: 'Inside Run' },
+    { value: 'outside-run', label: 'Outside Run' },
+    { value: 'option', label: 'Option' },
+    { value: 'quick-pass', label: 'Quick Pass' },
+    { value: 'medium-pass', label: 'Medium Pass' },
+    { value: 'deep-pass', label: 'Deep Pass' },
+    { value: 'play-action-pass', label: 'Play Action Pass' },
+    { value: 'screen-pass', label: 'Screen Pass' },
   ];
 
   const handleSavePlay = async () => {
