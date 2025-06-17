@@ -125,19 +125,19 @@ const ProfilePage = () => {
         <h3 className="text-base font-semibold text-gray-900">Playbook - {userPlays.length} plays</h3>
       </div>
 
-      {/* Favorite Formation & Play Type Grid - Smaller blocks like search */}
-      <div className="grid grid-cols-2 gap-4 flex-1">
-        <div className="bg-white rounded-lg p-6 flex items-center justify-center min-h-[80px] border-2 border-white hover:bg-green-100 transition-colors">
+      {/* Favorite Formation & Play Type Grid - Much smaller blocks */}
+      <div className="grid grid-cols-2 gap-3 flex-1">
+        <div className="bg-white rounded-lg p-3 flex items-center justify-center h-16 border-2 border-white hover:bg-green-100 transition-colors">
           <div className="text-center">
             <p className="text-xs text-gray-500 mb-1">Favorite Formation</p>
-            <span className="text-lg font-bold text-green-800" style={{ fontFamily: 'Georgia, serif' }}>{favoriteFormation}</span>
+            <span className="text-sm font-bold text-green-800" style={{ fontFamily: 'Georgia, serif' }}>{favoriteFormation}</span>
           </div>
         </div>
 
-        <div className="bg-white rounded-lg p-6 flex items-center justify-center min-h-[80px] border-2 border-white hover:bg-green-100 transition-colors">
+        <div className="bg-white rounded-lg p-3 flex items-center justify-center h-16 border-2 border-white hover:bg-green-100 transition-colors">
           <div className="text-center">
             <p className="text-xs text-gray-500 mb-1">Favorite Play Type</p>
-            <span className="text-lg font-bold text-green-800" style={{ fontFamily: 'Georgia, serif' }}>{favoritePlayType}</span>
+            <span className="text-sm font-bold text-green-800" style={{ fontFamily: 'Georgia, serif' }}>{favoritePlayType}</span>
           </div>
         </div>
       </div>
