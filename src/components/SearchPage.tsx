@@ -1,20 +1,30 @@
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Search as SearchIcon, Filter } from 'lucide-react';
 import { mockPlays } from '@/utils/mockData';
+import { Play } from '@/types/play';
 
 const SearchPage = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedFilter, setSelectedFilter] = useState('all');
-  const [filteredPlays, setFilteredPlays] = useState(mockPlays);
+  const [allPlays, setAllPlays] = useState<Play[]>([]);
+  const [filteredPlays, setFilteredPlays] = useState<Play[]>([]);
 
   const filters = [
     { id: 'all', label: 'All Plays' },
-    { id: 'red-zone', label: 'Red Zone' },
-    { id: 'play-action', label: 'Play Action' },
-    { id: 'screen', label: 'Screen Pass' },
-    { id: 'deep', label: 'Deep Ball' },
+    { id: 'pass', label: 'Pass' },
+    { id: 'run', label: 'Run' },
+    { id: 'trick', label: 'Trick' },
+    { id: 'rpo', label: 'RPO' },
   ];
+
+  useEffect(() => {
+    // Load all plays from localStorage and combine with mock plays
+    const savedAllPlays = JSON.parse(localStorage.getItem('allPlays') || '[]');
+    const combinedPlays = [...savedAllPlays, ...mockPlays];
+    setAllPlays(combinedPlays);
+    setFilteredPlays(combinedPlays);
+  }, []);
 
   const handleSearch = (query: string) => {
     setSearchQuery(query);
@@ -27,21 +37,21 @@ const SearchPage = () => {
   };
 
   const filterPlays = (query: string, filter: string) => {
-    let filtered = mockPlays;
+    let filtered = allPlays;
 
-    // Filter by search query
+    // Filter by search query (caption, description, or tags)
     if (query) {
       filtered = filtered.filter(play =>
         play.tags.some(tag => tag.toLowerCase().includes(query.toLowerCase())) ||
-        play.description.toLowerCase().includes(query.toLowerCase())
+        (play.description && play.description.toLowerCase().includes(query.toLowerCase())) ||
+        (play.caption && play.caption.toLowerCase().includes(query.toLowerCase())) ||
+        (play.play_type && play.play_type.toLowerCase().includes(query.toLowerCase()))
       );
     }
 
-    // Filter by category
+    // Filter by play type
     if (filter !== 'all') {
-      filtered = filtered.filter(play =>
-        play.tags.some(tag => tag.toLowerCase().includes(filter.replace('-', ' ')))
-      );
+      filtered = filtered.filter(play => play.play_type === filter);
     }
 
     setFilteredPlays(filtered);
@@ -106,6 +116,13 @@ const SearchPage = () => {
                   </div>
                   <p className="text-xs opacity-75">{play.source}</p>
                 </div>
+                
+                {/* Play Type Badge */}
+                {play.play_type && (
+                  <div className="absolute top-2 left-2 bg-green-600 px-2 py-1 rounded-full">
+                    <span className="text-white text-xs font-medium uppercase">{play.play_type}</span>
+                  </div>
+                )}
               </div>
 
               {/* Play Info */}
@@ -126,7 +143,9 @@ const SearchPage = () => {
                   )}
                 </div>
 
-                <p className="text-gray-600 text-sm mb-3 line-clamp-2">{play.description}</p>
+                <p className="text-gray-600 text-sm mb-3 line-clamp-2">
+                  {play.description || play.caption}
+                </p>
 
                 <div className="flex items-center justify-between">
                   <span className="text-xs text-gray-500">

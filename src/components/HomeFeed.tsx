@@ -1,13 +1,26 @@
-
 import { useState, useEffect } from 'react';
 import { Heart, Bookmark, Share, MessageCircle, User } from 'lucide-react';
 import { mockPlays } from '@/utils/mockData';
 import { useToast } from '@/hooks/use-toast';
+import { Play } from '@/types/play';
 
 const HomeFeed = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [plays, setPlays] = useState(mockPlays);
+  const [plays, setPlays] = useState<Play[]>([]);
   const { toast } = useToast();
+
+  useEffect(() => {
+    // Load plays from mock database (localStorage) and combine with default mock plays
+    const savedAllPlays = JSON.parse(localStorage.getItem('allPlays') || '[]');
+    const combinedPlays = [...savedAllPlays, ...mockPlays];
+    
+    // Sort by created_at (newest first)
+    const sortedPlays = combinedPlays.sort((a, b) => 
+      new Date(b.created_at || '').getTime() - new Date(a.created_at || '').getTime()
+    );
+    
+    setPlays(sortedPlays);
+  }, []);
 
   const handleSwipe = (direction: 'up' | 'down') => {
     if (direction === 'up' && currentIndex < plays.length - 1) {
@@ -55,6 +68,16 @@ const HomeFeed = () => {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [currentIndex]);
 
+  if (plays.length === 0) {
+    return (
+      <div className="h-screen bg-black flex items-center justify-center">
+        <div className="text-white text-center">
+          <p className="text-lg">Loading plays...</p>
+        </div>
+      </div>
+    );
+  }
+
   const currentPlay = plays[currentIndex];
 
   return (
@@ -69,6 +92,11 @@ const HomeFeed = () => {
             </div>
             <p className="text-lg font-medium">Play Preview</p>
             <p className="text-sm opacity-75 mt-1">{currentPlay.source}</p>
+            {currentPlay.play_type && (
+              <div className="mt-2 px-3 py-1 bg-green-600 rounded-full text-xs font-medium">
+                {currentPlay.play_type.toUpperCase()}
+              </div>
+            )}
           </div>
         </div>
 
@@ -135,13 +163,13 @@ const HomeFeed = () => {
         <div className="absolute bottom-20 left-0 right-0 p-4 bg-gradient-to-t from-black/80 to-transparent">
           <div className="mb-4">
             <div className="flex items-center mb-2">
-              <span className="text-white font-semibold text-lg">@coach_highlights</span>
+              <span className="text-white font-semibold text-lg">@{currentPlay.shared_by}</span>
               <span className="text-white ml-2">•</span>
               <span className="text-white ml-2 text-sm">Follow</span>
             </div>
             
             <p className="text-white text-sm mb-3 leading-relaxed">
-              {currentPlay.description}
+              {currentPlay.description || currentPlay.caption}
             </p>
 
             <div className="flex flex-wrap gap-2 mb-3">
@@ -159,7 +187,7 @@ const HomeFeed = () => {
               <div className="w-4 h-4 bg-white rounded-sm mr-2 flex items-center justify-center">
                 <div className="w-2 h-2 bg-black rounded-full"></div>
               </div>
-              <span className="text-white text-sm">Original sound - coach highlights</span>
+              <span className="text-white text-sm">Original sound - {currentPlay.source}</span>
             </div>
           </div>
         </div>
