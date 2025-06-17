@@ -179,7 +179,7 @@ const HomeFeed = () => {
         </div>
 
         {/* Right Side Actions */}
-        <div className="absolute right-4 bottom-24 flex flex-col items-center space-y-6">
+        <div className="absolute right-4 bottom-32 flex flex-col items-center space-y-6">
           {/* Profile Avatar */}
           <div className="relative">
             <div className="w-12 h-12 bg-gray-600 rounded-full flex items-center justify-center border-2 border-white">
@@ -237,8 +237,8 @@ const HomeFeed = () => {
           </div>
         </div>
 
-        {/* Bottom Info Overlay - positioned directly above nav bar */}
-        <div className="absolute bottom-16 left-0 right-0 p-4 bg-gradient-to-t from-black/80 to-transparent">
+        {/* Bottom Info Overlay - positioned with proper spacing from nav bar */}
+        <div className="absolute bottom-28 left-0 right-0 p-4 bg-gradient-to-t from-black/80 to-transparent">
           <div className="mb-2">
             <div className="flex items-center mb-2">
               <span className="text-white font-semibold text-lg">@{currentPlay.shared_by}</span>
@@ -289,7 +289,7 @@ const HomeFeed = () => {
         onClick={() => handleSwipe('down')}
       />
       <div
-        className="absolute bottom-16 left-0 right-0 h-1/2 cursor-pointer z-10"
+        className="absolute bottom-28 left-0 right-0 h-1/2 cursor-pointer z-10"
         onClick={() => handleSwipe('up')}
       />
     </div>

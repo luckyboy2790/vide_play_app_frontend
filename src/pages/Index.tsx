@@ -1,9 +1,7 @@
 
 import { useState } from 'react';
-import { Home, BookOpen, Search, User, LogOut } from 'lucide-react';
+import { Home, BookOpen, Search, User } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
-import { Button } from '@/components/ui/button';
-import { useToast } from '@/hooks/use-toast';
 import HomeFeed from '@/components/HomeFeed';
 import Playbook from '@/components/Playbook';
 import SearchPage from '@/components/SearchPage';
@@ -11,25 +9,7 @@ import ProfilePage from '@/components/ProfilePage';
 
 const Index = () => {
   const [activeTab, setActiveTab] = useState('home');
-  const { user, signOut } = useAuth();
-  const { toast } = useToast();
-
-  const handleSignOut = async () => {
-    try {
-      await signOut();
-      toast({
-        title: "Signed out",
-        description: "You've been logged out successfully.",
-      });
-    } catch (error) {
-      console.error('Sign out error:', error);
-      toast({
-        title: "Error signing out",
-        description: "Please try again.",
-        variant: "destructive",
-      });
-    }
-  };
+  const { user } = useAuth();
 
   const renderContent = () => {
     switch (activeTab) {
@@ -130,15 +110,6 @@ const Index = () => {
             <span className="text-xs mt-1 font-semibold">Profile</span>
             {activeTab === 'profile' && <div className="w-6 h-0.5 bg-white mt-1 rounded"></div>}
           </button>
-
-          <Button
-            onClick={handleSignOut}
-            variant="ghost"
-            size="sm"
-            className="text-white hover:bg-green-700 border border-white ml-2"
-          >
-            <LogOut size={16} />
-          </Button>
         </div>
       </nav>
     </div>
