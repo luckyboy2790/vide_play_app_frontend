@@ -20,6 +20,7 @@ const SharedPlayPreview = () => {
   const [video_url, setVideo_url] = useState<string>(initialVideoUrl);
   const [caption, setCaption] = useState<string>(initialCaption);
   const [playType, setPlayType] = useState<string>('');
+  const [formation, setFormation] = useState<string>('');
   const [isLoading, setIsLoading] = useState(false);
 
   const playTypes = [
@@ -31,13 +32,27 @@ const SharedPlayPreview = () => {
     { value: 'deep-pass', label: 'Deep Pass' },
     { value: 'play-action-pass', label: 'Play Action Pass' },
     { value: 'screen-pass', label: 'Screen Pass' },
+    { value: 'trick', label: 'Trick' },
+  ];
+
+  const formations = [
+    { value: 'trips', label: 'Trips' },
+    { value: 'trio', label: 'Trio' },
+    { value: 'ace', label: 'Ace' },
+    { value: 'empty', label: 'Empty' },
+    { value: 'full-house', label: 'Full House' },
+    { value: 'doubles', label: 'Doubles' },
+    { value: 'doubles-close', label: 'Doubles Close' },
+    { value: 'split-twins-offset', label: 'Split Twins Offset' },
+    { value: 'tight', label: 'Tight' },
+    { value: 'wing', label: 'Wing' },
   ];
 
   const handleSavePlay = async () => {
-    if (!playType) {
+    if (!playType || !formation) {
       toast({
-        title: "Please select a play type",
-        description: "You must select a play type before saving.",
+        title: "Please select both play type and formation",
+        description: "Both play type and formation are required before saving.",
         variant: "destructive",
       });
       return;
@@ -59,14 +74,14 @@ const SharedPlayPreview = () => {
         return;
       }
 
-      // Insert into Supabase plays table with proper default values
+      // Insert into Supabase plays table
       const { error } = await supabase
         .from('plays')
         .insert({
           video_url: video_url,
           caption: caption,
           play_type: playType,
-          formation: '', // Use empty string instead of null
+          formation: formation,
           tags: [],
           thumbnail_url: '', // Use empty string instead of null
           shared_by: platform,
@@ -86,7 +101,7 @@ const SharedPlayPreview = () => {
 
       toast({
         title: "Play saved!",
-        description: "AI is analyzing formation and tags.",
+        description: "Your play has been successfully saved.",
       });
 
       // Navigate back to home
@@ -190,17 +205,29 @@ const SharedPlayPreview = () => {
           </Select>
         </div>
 
-        {/* Auto-detection notice */}
-        <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
-          <p className="text-blue-800 text-sm">
-            <strong>Note:</strong> Formation and tags will be automatically detected and added after saving.
-          </p>
+        {/* Formation Selection */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Formation *
+          </label>
+          <Select value={formation} onValueChange={setFormation}>
+            <SelectTrigger className="w-full">
+              <SelectValue placeholder="Select formation..." />
+            </SelectTrigger>
+            <SelectContent>
+              {formations.map((form) => (
+                <SelectItem key={form.value} value={form.value}>
+                  {form.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </div>
 
         {/* Save Button */}
         <Button
           onClick={handleSavePlay}
-          disabled={isLoading || !playType}
+          disabled={isLoading || !playType || !formation}
           className="w-full bg-green-600 hover:bg-green-700 text-white"
           size="lg"
         >
