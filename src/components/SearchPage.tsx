@@ -36,12 +36,10 @@ const SearchPage = () => {
         <div className="absolute bottom-1/5 right-1/3 w-3 h-3 border-2 border-white opacity-25 rounded-full"></div>
       </div>
 
-      {/* Search By Section */}
+      {/* Main content container */}
       <div className="w-full max-w-md relative z-10">
-        <SearchHeader />
-        
-        {/* Search Bar */}
-        <div className="mb-6 relative">
+        {/* Search Bar at the top */}
+        <div className="mb-8 relative">
           <div className="relative">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-green-600 h-4 w-4" />
             <Input
@@ -56,6 +54,7 @@ const SearchPage = () => {
           <div className="absolute -bottom-2 left-2 right-2 h-0.5 bg-white opacity-60"></div>
         </div>
         
+        <SearchHeader />
         <SearchBySection />
       </div>
     </div>
