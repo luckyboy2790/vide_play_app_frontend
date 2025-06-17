@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Search } from 'lucide-react';
 import { Input } from '@/components/ui/input';
@@ -18,16 +17,16 @@ const SearchPage = () => {
         </h1>
       </div>
 
-      {/* Search Bar directly under header */}
-      <div className="px-4 py-4 bg-green-600 relative z-10">
+      {/* Floating Search Bar */}
+      <div className="px-4 py-4 relative z-10">
         <div className="relative max-w-md mx-auto">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-green-600 h-4 w-4" />
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
           <Input
             type="text"
             placeholder="Search plays..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="pl-10 bg-white border-2 border-white rounded-lg shadow-lg text-green-800 placeholder-green-500 focus:ring-2 focus:ring-white focus:border-white"
+            className="pl-10 bg-white border border-gray-300 rounded-lg shadow-md text-gray-900 placeholder-gray-500 focus:ring-2 focus:ring-green-500 focus:border-green-500"
           />
         </div>
       </div>
@@ -61,7 +60,6 @@ const SearchPage = () => {
       {/* Main content container - centered */}
       <div className="flex-1 flex flex-col justify-center items-center">
         <div className="w-full max-w-md relative z-10">
-          <SearchHeader />
           <SearchBySection />
         </div>
       </div>
