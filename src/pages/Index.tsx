@@ -1,6 +1,9 @@
 
 import { useState } from 'react';
-import { Home, BookOpen, Search, User } from 'lucide-react';
+import { Home, BookOpen, Search, User, LogOut } from 'lucide-react';
+import { useAuth } from '@/contexts/AuthContext';
+import { Button } from '@/components/ui/button';
+import { useToast } from '@/hooks/use-toast';
 import HomeFeed from '@/components/HomeFeed';
 import Playbook from '@/components/Playbook';
 import SearchPage from '@/components/SearchPage';
@@ -8,6 +11,25 @@ import ProfilePage from '@/components/ProfilePage';
 
 const Index = () => {
   const [activeTab, setActiveTab] = useState('home');
+  const { user, signOut } = useAuth();
+  const { toast } = useToast();
+
+  const handleSignOut = async () => {
+    try {
+      await signOut();
+      toast({
+        title: "Signed out",
+        description: "You've been logged out successfully.",
+      });
+    } catch (error) {
+      console.error('Sign out error:', error);
+      toast({
+        title: "Error signing out",
+        description: "Please try again.",
+        variant: "destructive",
+      });
+    }
+  };
 
   const renderContent = () => {
     switch (activeTab) {
@@ -29,10 +51,18 @@ const Index = () => {
       {/* Header with For You Plays tab */}
       {activeTab === 'home' && (
         <header className="absolute top-0 left-0 right-0 z-20 px-4 py-3 bg-transparent">
-          <div className="flex justify-center items-center">
+          <div className="flex justify-between items-center">
             <button className="text-white font-bold text-lg border-b-2 border-white pb-1">
               For You Plays
             </button>
+            <Button
+              onClick={handleSignOut}
+              variant="ghost"
+              size="sm"
+              className="text-white hover:bg-gray-800"
+            >
+              <LogOut size={16} />
+            </Button>
           </div>
         </header>
       )}
@@ -40,11 +70,21 @@ const Index = () => {
       {/* Header for other tabs */}
       {activeTab !== 'home' && (
         <header className="bg-white border-b border-gray-200 px-4 py-3 sticky top-0 z-10">
-          <h1 className="text-2xl font-bold text-gray-900">
-            {activeTab === 'playbook' && 'My Playbook'}
-            {activeTab === 'search' && 'Search Plays'}
-            {activeTab === 'profile' && 'Profile'}
-          </h1>
+          <div className="flex justify-between items-center">
+            <h1 className="text-2xl font-bold text-gray-900">
+              {activeTab === 'playbook' && 'My Playbook'}
+              {activeTab === 'search' && 'Search Plays'}
+              {activeTab === 'profile' && 'Profile'}
+            </h1>
+            <Button
+              onClick={handleSignOut}
+              variant="ghost"
+              size="sm"
+              className="text-gray-600 hover:bg-gray-100"
+            >
+              <LogOut size={16} />
+            </Button>
+          </div>
         </header>
       )}
 
