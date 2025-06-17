@@ -175,7 +175,7 @@ const SearchPage = () => {
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           {filteredPlays.map((play) => (
-            <div key={play.i d} className="bg-white rounded-lg shadow-md overflow-hidden border border-gray-200 hover:shadow-lg transition-shadow">
+            <div key={play.id} className="bg-white rounded-lg shadow-md overflow-hidden border border-gray-200 hover:shadow-lg transition-shadow">
               <div className="aspect-video bg-gray-900 relative flex items-center justify-center">
                 <div className="text-white text-center">
                   <div className="w-12 h-12 bg-green-600 rounded-full flex items-center justify-center mx-auto mb-2">
