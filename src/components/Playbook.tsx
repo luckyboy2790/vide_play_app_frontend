@@ -2,6 +2,7 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import { Play } from 'lucide-react';
 
 interface PlayData {
   id: string;
@@ -65,46 +66,109 @@ const Playbook = () => {
     return (
       <div className="h-full flex items-center justify-center">
         <div className="text-white text-center">
-          <p className="text-lg">Loading...</p>
+          <div className="animate-spin rounded-full h-8 w-8 border-2 border-white border-t-transparent mx-auto mb-3"></div>
+          <p className="text-lg font-bold" style={{ fontFamily: 'Georgia, serif', textShadow: '2px 2px 4px rgba(0,0,0,0.8)' }}>Loading Playbook...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="h-full flex flex-col p-4 overflow-hidden">
+    <div className="h-full flex flex-col p-4 overflow-hidden relative">
+      {/* Chalk dust particles effect */}
+      <div className="absolute inset-0 opacity-30 pointer-events-none">
+        <div className="absolute top-10 left-8 w-1 h-1 bg-white rounded-full animate-pulse"></div>
+        <div className="absolute top-20 right-12 w-0.5 h-0.5 bg-white rounded-full animate-pulse delay-300"></div>
+        <div className="absolute bottom-32 left-16 w-1.5 h-1.5 bg-white rounded-full animate-pulse delay-700"></div>
+        <div className="absolute bottom-20 right-8 w-0.5 h-0.5 bg-white rounded-full animate-pulse delay-1000"></div>
+      </div>
+
       {/* Play of the Day Header */}
       <div className="text-center mb-4 flex-shrink-0">
-        <h2 className="text-2xl font-bold text-white mb-4">Play of the Day</h2>
+        <h2 className="text-3xl font-bold text-white mb-4 relative" style={{ 
+          fontFamily: 'Georgia, serif', 
+          textShadow: '3px 3px 6px rgba(0,0,0,0.8)',
+          transform: 'rotate(-1deg)'
+        }}>
+          ⭐ PLAY OF THE DAY ⭐
+          {/* Underline chalk effect */}
+          <div className="absolute -bottom-2 left-1/2 transform -translate-x-1/2 w-48 h-1 bg-white opacity-70 rounded-full" style={{ transform: 'translateX(-50%) rotate(1deg)' }}></div>
+        </h2>
         
-        {/* Video Rectangle */}
+        {/* Video Rectangle with enhanced chalkboard styling */}
         {playOfTheDay && (
-          <div className="bg-black rounded-lg overflow-hidden mb-6">
+          <div className="bg-black rounded-lg overflow-hidden mb-6 relative border-4 border-white border-opacity-80 shadow-2xl" style={{ 
+            boxShadow: 'inset 0 0 20px rgba(255,255,255,0.1), 0 8px 32px rgba(0,0,0,0.6)' 
+          }}>
+            {/* Chalk frame corners */}
+            <div className="absolute top-1 left-1 w-4 h-4 border-l-2 border-t-2 border-white opacity-60"></div>
+            <div className="absolute top-1 right-1 w-4 h-4 border-r-2 border-t-2 border-white opacity-60"></div>
+            <div className="absolute bottom-1 left-1 w-4 h-4 border-l-2 border-b-2 border-white opacity-60"></div>
+            <div className="absolute bottom-1 right-1 w-4 h-4 border-r-2 border-b-2 border-white opacity-60"></div>
+            
             <div className="aspect-video relative flex items-center justify-center">
               <div className="text-white text-center">
-                <div className="w-16 h-16 bg-green-600 rounded-full flex items-center justify-center mx-auto mb-3">
-                  <div className="w-0 h-0 border-l-[12px] border-l-white border-t-[9px] border-t-transparent border-b-[9px] border-b-transparent ml-1"></div>
+                <div className="w-20 h-20 bg-gradient-to-br from-green-500 to-green-700 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg animate-pulse">
+                  <Play size={32} className="text-white ml-1 drop-shadow-lg" fill="white" />
                 </div>
-                <p className="text-base font-medium">Play on Loop</p>
+                <p className="text-lg font-bold" style={{ 
+                  fontFamily: 'Georgia, serif',
+                  textShadow: '2px 2px 4px rgba(0,0,0,0.8)',
+                  letterSpacing: '1px'
+                }}>🔄 PLAY ON LOOP 🔄</p>
               </div>
             </div>
           </div>
         )}
       </div>
 
-      {/* Find Your Play Section */}
+      {/* Find Your Play Section with enhanced chalkboard styling */}
       <div className="text-center flex-1 flex flex-col justify-center">
-        <h3 className="text-xl font-bold text-white mb-4">Find Your Play</h3>
+        <h3 className="text-2xl font-bold text-white mb-6 relative" style={{ 
+          fontFamily: 'Georgia, serif',
+          textShadow: '2px 2px 4px rgba(0,0,0,0.8)',
+          transform: 'rotate(0.5deg)'
+        }}>
+          📚 FIND YOUR PLAY 📚
+          {/* Chalk underline */}
+          <div className="absolute -bottom-1 left-1/2 transform -translate-x-1/2 w-32 h-0.5 bg-white opacity-60 rounded-full"></div>
+        </h3>
         
-        <div className="grid grid-cols-2 gap-3 max-w-sm mx-auto">
-          {/* Formation Block */}
-          <div className="bg-white rounded-lg p-6 flex items-center justify-center min-h-[100px]">
-            <span className="text-xl font-bold text-gray-800">Formation</span>
+        <div className="grid grid-cols-2 gap-4 max-w-sm mx-auto">
+          {/* Formation Block - Enhanced chalkboard style */}
+          <div className="bg-white rounded-lg p-6 flex items-center justify-center min-h-[100px] relative transform hover:scale-105 transition-all duration-300 shadow-xl border-2 border-gray-200" style={{ 
+            boxShadow: '0 8px 25px rgba(0,0,0,0.15), inset 0 1px 0 rgba(255,255,255,0.8)',
+            background: 'linear-gradient(145deg, #ffffff, #f8f9fa)'
+          }}>
+            {/* Chalk dust effect on corners */}
+            <div className="absolute top-1 right-1 w-2 h-2 bg-gray-200 rounded-full opacity-50"></div>
+            <div className="absolute bottom-2 left-2 w-1 h-1 bg-gray-300 rounded-full opacity-40"></div>
+            
+            <span className="text-xl font-bold text-gray-800 relative" style={{ 
+              fontFamily: 'Georgia, serif',
+              textShadow: '1px 1px 2px rgba(0,0,0,0.1)',
+              transform: 'rotate(-0.5deg)'
+            }}>
+              🏈 Formation
+            </span>
           </div>
           
-          {/* Play Type Block */}
-          <div className="bg-white rounded-lg p-6 flex items-center justify-center min-h-[100px]">
-            <span className="text-xl font-bold text-gray-800">Play Type</span>
+          {/* Play Type Block - Enhanced chalkboard style */}
+          <div className="bg-white rounded-lg p-6 flex items-center justify-center min-h-[100px] relative transform hover:scale-105 transition-all duration-300 shadow-xl border-2 border-gray-200" style={{ 
+            boxShadow: '0 8px 25px rgba(0,0,0,0.15), inset 0 1px 0 rgba(255,255,255,0.8)',
+            background: 'linear-gradient(145deg, #ffffff, #f8f9fa)'
+          }}>
+            {/* Chalk dust effect on corners */}
+            <div className="absolute top-2 left-1 w-1 h-1 bg-gray-300 rounded-full opacity-50"></div>
+            <div className="absolute bottom-1 right-2 w-2 h-2 bg-gray-200 rounded-full opacity-40"></div>
+            
+            <span className="text-xl font-bold text-gray-800 relative" style={{ 
+              fontFamily: 'Georgia, serif',
+              textShadow: '1px 1px 2px rgba(0,0,0,0.1)',
+              transform: 'rotate(0.3deg)'
+            }}>
+              ⚡ Play Type
+            </span>
           </div>
         </div>
       </div>
