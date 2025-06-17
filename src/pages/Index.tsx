@@ -26,12 +26,12 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-black max-w-sm mx-auto relative">
-      {/* Header with For You tab */}
+      {/* Header with For You Plays tab */}
       {activeTab === 'home' && (
         <header className="absolute top-0 left-0 right-0 z-20 px-4 py-3 bg-transparent">
           <div className="flex justify-center items-center">
             <button className="text-white font-bold text-lg border-b-2 border-white pb-1">
-              For You
+              For You Plays
             </button>
           </div>
         </header>
