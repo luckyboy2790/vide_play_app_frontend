@@ -9,7 +9,29 @@ const SearchPage = () => {
   const [searchQuery, setSearchQuery] = useState('');
 
   return (
-    <div className="h-full flex flex-col justify-center items-center px-4 overflow-hidden relative">
+    <div className="h-full flex flex-col px-4 overflow-hidden relative">
+      {/* Main Header */}
+      <div className="flex items-center justify-center py-4 bg-green-700 relative z-10">
+        <Search className="mr-2 h-6 w-6 text-white" />
+        <h1 className="text-white text-xl font-bold" style={{ fontFamily: 'Georgia, serif' }}>
+          SEARCH PLAYS
+        </h1>
+      </div>
+
+      {/* Search Bar directly under header */}
+      <div className="px-4 py-4 bg-green-600 relative z-10">
+        <div className="relative max-w-md mx-auto">
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-green-600 h-4 w-4" />
+          <Input
+            type="text"
+            placeholder="Search plays..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="pl-10 bg-white border-2 border-white rounded-lg shadow-lg text-green-800 placeholder-green-500 focus:ring-2 focus:ring-white focus:border-white"
+          />
+        </div>
+      </div>
+
       {/* Football diagram background elements */}
       <div className="absolute inset-0 pointer-events-none">
         {/* Diagonal chalk lines */}
@@ -36,26 +58,12 @@ const SearchPage = () => {
         <div className="absolute bottom-1/5 right-1/3 w-3 h-3 border-2 border-white opacity-25 rounded-full"></div>
       </div>
 
-      {/* Main content container */}
-      <div className="w-full max-w-md relative z-10">
-        {/* Search Bar at the top */}
-        <div className="mb-8 relative">
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-green-600 h-4 w-4" />
-            <Input
-              type="text"
-              placeholder="Search plays..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-10 bg-white border-2 border-white rounded-lg shadow-lg text-green-800 placeholder-green-500 focus:ring-2 focus:ring-white focus:border-white"
-            />
-          </div>
-          {/* Chalk underline for search bar */}
-          <div className="absolute -bottom-2 left-2 right-2 h-0.5 bg-white opacity-60"></div>
+      {/* Main content container - centered */}
+      <div className="flex-1 flex flex-col justify-center items-center">
+        <div className="w-full max-w-md relative z-10">
+          <SearchHeader />
+          <SearchBySection />
         </div>
-        
-        <SearchHeader />
-        <SearchBySection />
       </div>
     </div>
   );
