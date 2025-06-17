@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { Heart, Bookmark, Share, MessageCircle, User, Plus } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
@@ -138,12 +139,12 @@ const HomeFeed = () => {
 
   return (
     <div className="relative h-full overflow-hidden bg-black">
-      {/* Header with centered For You Plays and top-right FAB */}
+      {/* Header with centered Learn New Plays and top-right FAB */}
       <header className="absolute top-0 left-0 right-0 z-20 px-4 py-3 bg-transparent">
         <div className="flex justify-between items-center">
           <div className="flex-1 flex justify-center">
             <button className="text-white font-bold text-lg border-b-2 border-white pb-1">
-              For You Plays
+              Learn New Plays
             </button>
           </div>
           <button
