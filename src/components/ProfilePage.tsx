@@ -1,100 +1,207 @@
 
 import { useState, useEffect } from 'react';
-import { User, Share, Bookmark, Trophy } from 'lucide-react';
-import { Play } from '@/types/play';
+import { User, Share, Bookmark, Trophy, Settings, TrendingUp } from 'lucide-react';
+import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/contexts/AuthContext';
+import { useToast } from '@/hooks/use-toast';
+
+interface PlayData {
+  id: string;
+  caption: string;
+  play_type: string;
+  formation: string;
+  video_url: string;
+  shared_by: string;
+  created_at: string;
+  tags: string[];
+}
 
 const ProfilePage = () => {
-  const [savedCount, setSavedCount] = useState(0);
-  const [sharedPlays, setSharedPlays] = useState<Play[]>([]);
+  const [userPlays, setUserPlays] = useState<PlayData[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [favoriteFormation, setFavoriteFormation] = useState<string>('');
+  const [favoritePlayType, setFavoritePlayType] = useState<string>('');
+  const { user } = useAuth();
+  const { toast } = useToast();
 
   useEffect(() => {
-    const saved = JSON.parse(localStorage.getItem('savedPlays') || '[]');
-    setSavedCount(saved.length);
+    const fetchUserData = async () => {
+      if (!user) return;
 
-    // Get plays shared by current user
-    const allPlays = JSON.parse(localStorage.getItem('allPlays') || '[]');
-    const userPlays = allPlays.filter((play: Play) => play.shared_by === 'current_user');
-    setSharedPlays(userPlays);
-  }, []);
+      try {
+        const { data, error } = await supabase
+          .from('plays')
+          .select('*')
+          .eq('user_id', user.id)
+          .order('created_at', { ascending: false });
 
-  const stats = [
-    {
-      icon: Share,
-      label: 'Plays Shared',
-      value: sharedPlays.length,
-      color: 'text-blue-600',
-      bgColor: 'bg-blue-50',
-    },
-    {
-      icon: Bookmark,
-      label: 'Plays Saved',
-      value: savedCount,
-      color: 'text-green-600',
-      bgColor: 'bg-green-50',
-    },
-    {
-      icon: Trophy,
-      label: 'Total Likes',
-      value: sharedPlays.reduce((sum, play) => sum + play.likes, 0),
-      color: 'text-yellow-600',
-      bgColor: 'bg-yellow-50',
-    },
-  ];
+        if (error) {
+          console.error('Error fetching user plays:', error);
+          toast({
+            title: "Error loading plays",
+            description: "Could not load your plays.",
+            variant: "destructive",
+          });
+          return;
+        }
+
+        const transformedPlays: PlayData[] = (data || []).map(play => ({
+          id: play.id.toString(),
+          caption: play.caption || '',
+          play_type: play.play_type || '',
+          formation: play.formation || '',
+          video_url: play.video_url || '',
+          shared_by: play.shared_by || 'You',
+          created_at: play.created_at,
+          tags: Array.isArray(play.tags) ? play.tags : []
+        }));
+
+        setUserPlays(transformedPlays);
+
+        // Calculate favorite formation and play type
+        const formationCounts: { [key: string]: number } = {};
+        const playTypeCounts: { [key: string]: number } = {};
+
+        transformedPlays.forEach(play => {
+          if (play.formation) {
+            formationCounts[play.formation] = (formationCounts[play.formation] || 0) + 1;
+          }
+          if (play.play_type) {
+            playTypeCounts[play.play_type] = (playTypeCounts[play.play_type] || 0) + 1;
+          }
+        });
+
+        const topFormation = Object.entries(formationCounts).sort((a, b) => b[1] - a[1])[0];
+        const topPlayType = Object.entries(playTypeCounts).sort((a, b) => b[1] - a[1])[0];
+
+        setFavoriteFormation(topFormation ? topFormation[0] : 'None');
+        setFavoritePlayType(topPlayType ? topPlayType[0] : 'None');
+
+      } catch (error) {
+        console.error('Error fetching user data:', error);
+        toast({
+          title: "Error loading profile",
+          description: "Could not load your profile data.",
+          variant: "destructive",
+        });
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchUserData();
+  }, [user, toast]);
+
+  if (loading) {
+    return (
+      <div className="p-4">
+        <div className="text-center py-12">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading profile...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
-    <div className="p-4">
-      {/* Profile Header */}
-      <div className="text-center mb-8">
-        <div className="w-24 h-24 bg-green-600 rounded-full flex items-center justify-center mx-auto mb-4">
-          <User size={40} className="text-white" />
+    <div className="p-4 space-y-6">
+      {/* Profile Header with Settings */}
+      <div className="bg-white rounded-lg shadow-md p-6 border border-gray-200">
+        <div className="flex justify-between items-start mb-4">
+          <div className="flex items-center space-x-4">
+            <div className="w-16 h-16 bg-green-600 rounded-full flex items-center justify-center">
+              <User size={32} className="text-white" />
+            </div>
+            <div>
+              <h2 className="text-xl font-bold text-gray-900">Coach Johnson</h2>
+              <p className="text-gray-600">Varsity Football Coach</p>
+              <p className="text-sm text-gray-500">Lincoln High School</p>
+            </div>
+          </div>
+          <button className="p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition-colors">
+            <Settings size={20} />
+          </button>
         </div>
-        <h2 className="text-2xl font-bold text-gray-900 mb-1">Coach Johnson</h2>
-        <p className="text-gray-600">Varsity Football Coach</p>
-        <p className="text-sm text-gray-500 mt-2">Lincoln High School</p>
+      </div>
+
+      {/* Playbook Stats */}
+      <div className="bg-white rounded-lg shadow-md p-6 border border-gray-200">
+        <div className="flex items-center gap-3 mb-4">
+          <Bookmark className="text-green-600" size={24} />
+          <div>
+            <h3 className="text-lg font-semibold text-gray-900">Playbook</h3>
+            <p className="text-2xl font-bold text-green-600">{userPlays.length} plays</p>
+          </div>
+        </div>
+      </div>
+
+      {/* Favorite Formation & Play Type */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-lg p-6 border border-blue-200">
+          <div className="flex items-center gap-3 mb-2">
+            <TrendingUp className="text-blue-600" size={24} />
+            <h3 className="text-lg font-semibold text-gray-900">Favorite Formation</h3>
+          </div>
+          <p className="text-xl font-bold text-blue-700">{favoriteFormation}</p>
+          <p className="text-sm text-blue-600">Most used formation</p>
+        </div>
+
+        <div className="bg-gradient-to-br from-green-50 to-green-100 rounded-lg p-6 border border-green-200">
+          <div className="flex items-center gap-3 mb-2">
+            <Trophy className="text-green-600" size={24} />
+            <h3 className="text-lg font-semibold text-gray-900">Favorite Play Type</h3>
+          </div>
+          <p className="text-xl font-bold text-green-700">{favoritePlayType}</p>
+          <p className="text-sm text-green-600">Most used play type</p>
+        </div>
       </div>
 
       {/* Stats Grid */}
-      <div className="grid grid-cols-1 gap-4 mb-8">
-        {stats.map((stat, index) => (
-          <div key={index} className="bg-white rounded-lg shadow-md border border-gray-200 p-6">
-            <div className="flex items-center">
-              <div className={`p-3 rounded-lg ${stat.bgColor} mr-4`}>
-                <stat.icon size={24} className={stat.color} />
-              </div>
-              <div className="flex-1">
-                <p className="text-2xl font-bold text-gray-900">{stat.value}</p>
-                <p className="text-gray-600">{stat.label}</p>
-              </div>
+      <div className="grid grid-cols-1 gap-4">
+        <div className="bg-white rounded-lg shadow-md border border-gray-200 p-6">
+          <div className="flex items-center">
+            <div className="p-3 rounded-lg bg-blue-50 mr-4">
+              <Share size={24} className="text-blue-600" />
+            </div>
+            <div className="flex-1">
+              <p className="text-2xl font-bold text-gray-900">{userPlays.length}</p>
+              <p className="text-gray-600">Plays Shared</p>
             </div>
           </div>
-        ))}
+        </div>
+
+        <div className="bg-white rounded-lg shadow-md border border-gray-200 p-6">
+          <div className="flex items-center">
+            <div className="p-3 rounded-lg bg-yellow-50 mr-4">
+              <Trophy size={24} className="text-yellow-600" />
+            </div>
+            <div className="flex-1">
+              <p className="text-2xl font-bold text-gray-900">{userPlays.length * 5}</p>
+              <p className="text-gray-600">Total Views</p>
+            </div>
+          </div>
+        </div>
       </div>
 
-      {/* User's Shared Plays */}
-      {sharedPlays.length > 0 && (
-        <div className="mb-8">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">Your Shared Plays</h3>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            {sharedPlays.slice(0, 4).map((play) => (
-              <div key={play.id} className="bg-white rounded-lg shadow-md overflow-hidden border border-gray-200">
-                <div className="aspect-video bg-gray-900 relative flex items-center justify-center">
-                  <div className="text-white text-center">
-                    <div className="w-8 h-8 bg-green-600 rounded-full flex items-center justify-center mx-auto mb-1">
-                      <div className="w-0 h-0 border-l-[6px] border-l-white border-t-[4px] border-t-transparent border-b-[4px] border-b-transparent ml-1"></div>
-                    </div>
-                    <p className="text-xs opacity-75">{play.source}</p>
-                  </div>
-                  {play.play_type && (
-                    <div className="absolute top-2 left-2 bg-green-600 px-2 py-1 rounded-full">
-                      <span className="text-white text-xs font-medium uppercase">{play.play_type}</span>
-                    </div>
-                  )}
-                </div>
-                <div className="p-2">
-                  <p className="text-xs text-gray-600 line-clamp-2 mb-1">
-                    {play.description || play.caption}
+      {/* Recent Plays */}
+      {userPlays.length > 0 && (
+        <div className="bg-white rounded-lg shadow-md border border-gray-200 p-6">
+          <h3 className="text-lg font-semibold text-gray-900 mb-4">Your Recent Plays</h3>
+          <div className="space-y-4">
+            {userPlays.slice(0, 3).map((play) => (
+              <div key={play.id} className="flex items-start border-b border-gray-100 pb-4 last:border-b-0">
+                <div className="w-2 h-2 bg-green-600 rounded-full mt-2 mr-3"></div>
+                <div className="flex-1">
+                  <p className="text-sm font-medium text-gray-900">
+                    {play.play_type || 'Untitled Play'}
+                    {play.formation && ` - ${play.formation}`}
                   </p>
-                  <span className="text-xs text-gray-500">{play.likes} likes</span>
+                  <p className="text-xs text-gray-600 mt-1">
+                    {play.caption || 'No description'}
+                  </p>
+                  <p className="text-xs text-gray-500 mt-1">
+                    {new Date(play.created_at).toLocaleDateString()}
+                  </p>
                 </div>
               </div>
             ))}
@@ -102,42 +209,8 @@ const ProfilePage = () => {
         </div>
       )}
 
-      {/* Recent Activity */}
-      <div className="bg-white rounded-lg shadow-md border border-gray-200 p-6">
-        <h3 className="text-lg font-semibold text-gray-900 mb-4">Recent Activity</h3>
-        <div className="space-y-4">
-          {sharedPlays.slice(0, 3).map((play, index) => (
-            <div key={play.id} className="flex items-start">
-              <div className="w-2 h-2 bg-green-600 rounded-full mt-2 mr-3"></div>
-              <div>
-                <p className="text-sm text-gray-900">
-                  Shared play from {play.source}
-                </p>
-                <p className="text-xs text-gray-500">
-                  {new Date(play.created_at).toLocaleDateString()}
-                </p>
-              </div>
-            </div>
-          ))}
-          <div className="flex items-start">
-            <div className="w-2 h-2 bg-blue-600 rounded-full mt-2 mr-3"></div>
-            <div>
-              <p className="text-sm text-gray-900">Saved "Screen Pass - Bubble Route"</p>
-              <p className="text-xs text-gray-500">1 day ago</p>
-            </div>
-          </div>
-          <div className="flex items-start">
-            <div className="w-2 h-2 bg-yellow-600 rounded-full mt-2 mr-3"></div>
-            <div>
-              <p className="text-sm text-gray-900">Received 8 likes on shared play</p>
-              <p className="text-xs text-gray-500">2 days ago</p>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Settings/About */}
-      <div className="mt-6 text-center">
+      {/* Edit Profile Button */}
+      <div className="text-center">
         <button className="text-green-600 hover:text-green-700 font-medium">
           Edit Profile
         </button>
