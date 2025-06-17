@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
-import { Heart, Bookmark, Share, MessageCircle, User } from 'lucide-react';
+import { Heart, Bookmark, Share, MessageCircle, User, Plus } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { mockPlays } from '@/utils/mockData';
 import { useToast } from '@/hooks/use-toast';
 import { Play } from '@/types/play';
@@ -8,6 +9,7 @@ const HomeFeed = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [plays, setPlays] = useState<Play[]>([]);
   const { toast } = useToast();
+  const navigate = useNavigate();
 
   useEffect(() => {
     // Load plays from mock database (localStorage) and combine with default mock plays
@@ -214,6 +216,14 @@ const HomeFeed = () => {
         className="absolute bottom-20 left-0 right-0 h-1/2 cursor-pointer z-10"
         onClick={() => handleSwipe('up')}
       />
+
+      {/* Floating Action Button */}
+      <button
+        onClick={() => navigate('/shared-play-preview')}
+        className="fixed bottom-24 right-4 w-14 h-14 bg-green-600 hover:bg-green-700 text-white rounded-full shadow-lg flex items-center justify-center z-20 transition-colors"
+      >
+        <Plus size={24} />
+      </button>
     </div>
   );
 };
