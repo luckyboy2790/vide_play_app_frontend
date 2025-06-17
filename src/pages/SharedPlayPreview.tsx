@@ -14,10 +14,11 @@ const SharedPlayPreview = () => {
   const { toast } = useToast();
   
   const initialVideoUrl = searchParams.get('video_url') || '';
-  const caption = searchParams.get('caption') || '';
+  const initialCaption = searchParams.get('caption') || '';
   const platform = searchParams.get('platform') || '';
   
   const [video_url, setVideo_url] = useState<string>(initialVideoUrl);
+  const [caption, setCaption] = useState<string>(initialCaption);
   const [playType, setPlayType] = useState<string>('');
   const [isLoading, setIsLoading] = useState(false);
 
@@ -128,6 +129,20 @@ const SharedPlayPreview = () => {
           />
         </div>
 
+        {/* Caption Input */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Caption
+          </label>
+          <Input
+            type="text"
+            placeholder="Enter caption..."
+            value={caption}
+            onChange={(e) => setCaption(e.target.value)}
+            className="w-full"
+          />
+        </div>
+
         {/* Video Preview Placeholder */}
         <div className="aspect-video bg-gray-900 rounded-lg relative flex items-center justify-center">
           <div className="text-white text-center">
@@ -144,7 +159,7 @@ const SharedPlayPreview = () => {
           </div>
         </div>
 
-        {/* Caption */}
+        {/* Caption Display */}
         <div className="bg-gray-50 rounded-lg p-4">
           <h3 className="font-medium text-gray-900 mb-2">Caption</h3>
           <p className="text-gray-700 text-sm leading-relaxed">
