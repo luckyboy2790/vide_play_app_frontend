@@ -75,23 +75,77 @@ const Playbook = () => {
 
   return (
     <div className="h-full flex flex-col p-4 overflow-hidden relative">
-      {/* Chalk dust particles effect */}
-      <div className="absolute inset-0 opacity-30 pointer-events-none">
-        <div className="absolute top-10 left-8 w-1 h-1 bg-white rounded-full animate-pulse"></div>
-        <div className="absolute top-20 right-12 w-0.5 h-0.5 bg-white rounded-full animate-pulse delay-300"></div>
-        <div className="absolute bottom-32 left-16 w-1.5 h-1.5 bg-white rounded-full animate-pulse delay-700"></div>
-        <div className="absolute bottom-20 right-8 w-0.5 h-0.5 bg-white rounded-full animate-pulse delay-1000"></div>
-      </div>
+      {/* Football diagram chalk lines and arrows */}
+      <svg className="absolute inset-0 w-full h-full pointer-events-none opacity-30" style={{ zIndex: 1 }}>
+        {/* Arrow pointing to Play of the Day */}
+        <path 
+          d="M 50 80 Q 80 60 120 50" 
+          stroke="white" 
+          strokeWidth="2" 
+          fill="none" 
+          strokeDasharray="4,4"
+          opacity="0.7"
+        />
+        <polygon points="115,45 125,50 115,55" fill="white" opacity="0.7" />
+        
+        {/* Curved line from video to formation */}
+        <path 
+          d="M 200 180 Q 150 220 100 260" 
+          stroke="white" 
+          strokeWidth="2" 
+          fill="none" 
+          strokeDasharray="3,3"
+          opacity="0.6"
+        />
+        <polygon points="95,255 105,260 95,265" fill="white" opacity="0.6" />
+        
+        {/* Line from formation to play type */}
+        <path 
+          d="M 180 260 L 220 260" 
+          stroke="white" 
+          strokeWidth="2" 
+          fill="none" 
+          strokeDasharray="5,3"
+          opacity="0.6"
+        />
+        <polygon points="215,255 225,260 215,265" fill="white" opacity="0.6" />
+        
+        {/* Diagonal strategy line */}
+        <path 
+          d="M 50 200 Q 120 180 180 200" 
+          stroke="white" 
+          strokeWidth="1.5" 
+          fill="none" 
+          strokeDasharray="2,2"
+          opacity="0.4"
+        />
+        
+        {/* X marks like in football diagrams */}
+        <g opacity="0.3" stroke="white" strokeWidth="2">
+          <line x1="60" y1="120" x2="70" y2="130" />
+          <line x1="70" y1="120" x2="60" y2="130" />
+          
+          <line x1="280" y1="100" x2="290" y2="110" />
+          <line x1="290" y1="100" x2="280" y2="110" />
+          
+          <line x1="30" y1="300" x2="40" y2="310" />
+          <line x1="40" y1="300" x2="30" y2="310" />
+        </g>
+        
+        {/* Circle formations */}
+        <circle cx="80" cy="160" r="4" stroke="white" strokeWidth="1.5" fill="none" opacity="0.4" />
+        <circle cx="250" cy="180" r="3" stroke="white" strokeWidth="1.5" fill="none" opacity="0.4" />
+      </svg>
 
       {/* Play of the Day Header */}
-      <div className="text-center mb-4 flex-shrink-0">
+      <div className="text-center mb-4 flex-shrink-0 relative" style={{ zIndex: 2 }}>
         <h2 className="text-3xl font-bold text-white mb-4 relative" style={{ 
           fontFamily: 'Georgia, serif', 
           textShadow: '3px 3px 6px rgba(0,0,0,0.8)',
           transform: 'rotate(-1deg)'
         }}>
-          ⭐ PLAY OF THE DAY ⭐
-          {/* Underline chalk effect */}
+          PLAY OF THE DAY
+          {/* Chalk underline */}
           <div className="absolute -bottom-2 left-1/2 transform -translate-x-1/2 w-48 h-1 bg-white opacity-70 rounded-full" style={{ transform: 'translateX(-50%) rotate(1deg)' }}></div>
         </h2>
         
@@ -115,27 +169,27 @@ const Playbook = () => {
                   fontFamily: 'Georgia, serif',
                   textShadow: '2px 2px 4px rgba(0,0,0,0.8)',
                   letterSpacing: '1px'
-                }}>🔄 PLAY ON LOOP 🔄</p>
+                }}>PLAY ON LOOP</p>
               </div>
             </div>
           </div>
         )}
       </div>
 
-      {/* Find Your Play Section with enhanced chalkboard styling */}
-      <div className="text-center flex-1 flex flex-col justify-center">
+      {/* Find Your Play Section */}
+      <div className="text-center flex-1 flex flex-col justify-center relative" style={{ zIndex: 2 }}>
         <h3 className="text-2xl font-bold text-white mb-6 relative" style={{ 
           fontFamily: 'Georgia, serif',
           textShadow: '2px 2px 4px rgba(0,0,0,0.8)',
           transform: 'rotate(0.5deg)'
         }}>
-          📚 FIND YOUR PLAY 📚
+          FIND YOUR PLAY
           {/* Chalk underline */}
           <div className="absolute -bottom-1 left-1/2 transform -translate-x-1/2 w-32 h-0.5 bg-white opacity-60 rounded-full"></div>
         </h3>
         
         <div className="grid grid-cols-2 gap-4 max-w-sm mx-auto">
-          {/* Formation Block - Enhanced chalkboard style */}
+          {/* Formation Block */}
           <div className="bg-white rounded-lg p-6 flex items-center justify-center min-h-[100px] relative transform hover:scale-105 transition-all duration-300 shadow-xl border-2 border-gray-200" style={{ 
             boxShadow: '0 8px 25px rgba(0,0,0,0.15), inset 0 1px 0 rgba(255,255,255,0.8)',
             background: 'linear-gradient(145deg, #ffffff, #f8f9fa)'
@@ -149,11 +203,11 @@ const Playbook = () => {
               textShadow: '1px 1px 2px rgba(0,0,0,0.1)',
               transform: 'rotate(-0.5deg)'
             }}>
-              🏈 Formation
+              Formation
             </span>
           </div>
           
-          {/* Play Type Block - Enhanced chalkboard style */}
+          {/* Play Type Block */}
           <div className="bg-white rounded-lg p-6 flex items-center justify-center min-h-[100px] relative transform hover:scale-105 transition-all duration-300 shadow-xl border-2 border-gray-200" style={{ 
             boxShadow: '0 8px 25px rgba(0,0,0,0.15), inset 0 1px 0 rgba(255,255,255,0.8)',
             background: 'linear-gradient(145deg, #ffffff, #f8f9fa)'
@@ -167,7 +221,7 @@ const Playbook = () => {
               textShadow: '1px 1px 2px rgba(0,0,0,0.1)',
               transform: 'rotate(0.3deg)'
             }}>
-              ⚡ Play Type
+              Play Type
             </span>
           </div>
         </div>
