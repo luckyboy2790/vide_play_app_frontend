@@ -1,7 +1,9 @@
+
 import { useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { ArrowLeft, Save } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
@@ -11,10 +13,11 @@ const SharedPlayPreview = () => {
   const [searchParams] = useSearchParams();
   const { toast } = useToast();
   
-  const videoUrl = searchParams.get('video_url') || '';
+  const initialVideoUrl = searchParams.get('video_url') || '';
   const caption = searchParams.get('caption') || '';
   const platform = searchParams.get('platform') || '';
   
+  const [video_url, setVideo_url] = useState<string>(initialVideoUrl);
   const [playType, setPlayType] = useState<string>('');
   const [isLoading, setIsLoading] = useState(false);
 
@@ -55,7 +58,7 @@ const SharedPlayPreview = () => {
       const { error } = await supabase
         .from('plays')
         .insert({
-          video_url: videoUrl,
+          video_url: video_url,
           caption: caption,
           play_type: playType,
           formation: null,
@@ -111,6 +114,20 @@ const SharedPlayPreview = () => {
       </header>
 
       <div className="p-4 space-y-6">
+        {/* Video URL Input */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Video URL
+          </label>
+          <Input
+            type="url"
+            placeholder="Paste video link here..."
+            value={video_url}
+            onChange={(e) => setVideo_url(e.target.value)}
+            className="w-full"
+          />
+        </div>
+
         {/* Video Preview Placeholder */}
         <div className="aspect-video bg-gray-900 rounded-lg relative flex items-center justify-center">
           <div className="text-white text-center">
