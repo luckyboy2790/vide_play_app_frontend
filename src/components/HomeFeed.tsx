@@ -2,28 +2,69 @@
 import { useState, useEffect } from 'react';
 import { Heart, Bookmark, Share, MessageCircle, User, Plus } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { mockPlays } from '@/utils/mockData';
 import { useToast } from '@/hooks/use-toast';
+import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/contexts/AuthContext';
 import { Play } from '@/types/play';
 
 const HomeFeed = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [plays, setPlays] = useState<Play[]>([]);
+  const [loading, setLoading] = useState(true);
   const { toast } = useToast();
   const navigate = useNavigate();
+  const { user } = useAuth();
 
   useEffect(() => {
-    // Load plays from mock database (localStorage) and combine with default mock plays
-    const savedAllPlays = JSON.parse(localStorage.getItem('allPlays') || '[]');
-    const combinedPlays = [...savedAllPlays, ...mockPlays];
-    
-    // Sort by created_at (newest first)
-    const sortedPlays = combinedPlays.sort((a, b) => 
-      new Date(b.created_at || '').getTime() - new Date(a.created_at || '').getTime()
-    );
-    
-    setPlays(sortedPlays);
-  }, []);
+    const fetchPlays = async () => {
+      try {
+        const { data, error } = await supabase
+          .from('plays')
+          .select('*')
+          .order('created_at', { ascending: false });
+
+        if (error) {
+          console.error('Error fetching plays:', error);
+          toast({
+            title: "Error loading plays",
+            description: "Could not load plays from database.",
+            variant: "destructive",
+          });
+          return;
+        }
+
+        // Transform Supabase data to match Play interface
+        const transformedPlays: Play[] = (data || []).map(play => ({
+          id: play.id.toString(),
+          video_url: play.video_url || '',
+          caption: play.caption || '',
+          play_type: play.play_type || '',
+          formation: play.formation || '',
+          tags: Array.isArray(play.tags) ? play.tags : [],
+          shared_by: play.shared_by || 'Anonymous',
+          created_at: play.created_at,
+          likes: Math.floor(Math.random() * 1000), // Mock likes for now
+          liked: false,
+          saved: false,
+          source: 'PlayCallVault',
+          description: play.caption || ''
+        }));
+
+        setPlays(transformedPlays);
+      } catch (error) {
+        console.error('Error fetching plays:', error);
+        toast({
+          title: "Error loading plays",
+          description: "Could not load plays from database.",
+          variant: "destructive",
+        });
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchPlays();
+  }, [toast]);
 
   const handleSwipe = (direction: 'up' | 'down') => {
     if (direction === 'up' && currentIndex < plays.length - 1) {
@@ -33,19 +74,21 @@ const HomeFeed = () => {
     }
   };
 
-  const saveToPlaybook = (playId: string) => {
+  const saveToPlaybook = async (playId: string) => {
+    if (!user) {
+      toast({
+        title: "Authentication required",
+        description: "Please log in to save plays.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // For now, just update local state - in a real app you'd save to a user_saved_plays table
     const updatedPlays = plays.map(play => 
       play.id === playId ? { ...play, saved: true } : play
     );
     setPlays(updatedPlays);
-    
-    // Save to localStorage for persistence
-    const savedPlays = JSON.parse(localStorage.getItem('savedPlays') || '[]');
-    const playToSave = plays.find(p => p.id === playId);
-    if (playToSave && !savedPlays.find((p: any) => p.id === playId)) {
-      savedPlays.push({ ...playToSave, saved: true });
-      localStorage.setItem('savedPlays', JSON.stringify(savedPlays));
-    }
     
     toast({
       title: "Play Saved!",
@@ -71,11 +114,22 @@ const HomeFeed = () => {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [currentIndex]);
 
-  if (plays.length === 0) {
+  if (loading) {
     return (
       <div className="h-screen bg-black flex items-center justify-center">
         <div className="text-white text-center">
           <p className="text-lg">Loading plays...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (plays.length === 0) {
+    return (
+      <div className="h-screen bg-black flex items-center justify-center">
+        <div className="text-white text-center">
+          <p className="text-lg">No plays available</p>
+          <p className="text-sm opacity-75 mt-2">Create your first play to get started!</p>
         </div>
       </div>
     );
@@ -115,6 +169,11 @@ const HomeFeed = () => {
             {currentPlay.play_type && (
               <div className="mt-2 px-3 py-1 bg-green-600 rounded-full text-xs font-medium">
                 {currentPlay.play_type.toUpperCase()}
+              </div>
+            )}
+            {currentPlay.formation && (
+              <div className="mt-1 px-3 py-1 bg-blue-600 rounded-full text-xs font-medium">
+                {currentPlay.formation.toUpperCase()}
               </div>
             )}
           </div>
