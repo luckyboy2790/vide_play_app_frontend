@@ -69,78 +69,9 @@ const Index = () => {
       }}></div>
 
       {/* Main Content */}
-      <main className="pb-20 relative">
+      <main className="relative">
         {renderContent()}
       </main>
-
-      {/* Bottom Navigation - Chalkboard style */}
-      <nav className="fixed bottom-0 left-1/2 transform -translate-x-1/2 max-w-sm w-full bg-green-900 border-t-2 border-white relative">
-        {/* Chalk dust effect */}
-        <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-white to-transparent opacity-60"></div>
-        
-        <div className="flex justify-around items-center py-3">
-          <button
-            onClick={() => setActiveTab('home')}
-            className={`flex flex-col items-center p-2 transition-all duration-200 ${
-              activeTab === 'home' 
-                ? 'text-white transform scale-110' 
-                : 'text-green-300 hover:text-white hover:scale-105'
-            }`}
-          >
-            <Home size={24} className="drop-shadow-lg" />
-            <span className="text-xs mt-1 font-semibold">Home</span>
-            {activeTab === 'home' && <div className="w-6 h-0.5 bg-white mt-1 rounded"></div>}
-          </button>
-          
-          <button
-            onClick={() => setActiveTab('playbook')}
-            className={`flex flex-col items-center p-2 transition-all duration-200 ${
-              activeTab === 'playbook' 
-                ? 'text-white transform scale-110' 
-                : 'text-green-300 hover:text-white hover:scale-105'
-            }`}
-          >
-            <BookOpen size={24} className="drop-shadow-lg" />
-            <span className="text-xs mt-1 font-semibold">Playbook</span>
-            {activeTab === 'playbook' && <div className="w-6 h-0.5 bg-white mt-1 rounded"></div>}
-          </button>
-          
-          <button
-            onClick={() => setActiveTab('search')}
-            className={`flex flex-col items-center p-2 transition-all duration-200 ${
-              activeTab === 'search' 
-                ? 'text-white transform scale-110' 
-                : 'text-green-300 hover:text-white hover:scale-105'
-            }`}
-          >
-            <Search size={24} className="drop-shadow-lg" />
-            <span className="text-xs mt-1 font-semibold">Search</span>
-            {activeTab === 'search' && <div className="w-6 h-0.5 bg-white mt-1 rounded"></div>}
-          </button>
-          
-          <button
-            onClick={() => setActiveTab('profile')}
-            className={`flex flex-col items-center p-2 transition-all duration-200 ${
-              activeTab === 'profile' 
-                ? 'text-white transform scale-110' 
-                : 'text-green-300 hover:text-white hover:scale-105'
-            }`}
-          >
-            <User size={24} className="drop-shadow-lg" />
-            <span className="text-xs mt-1 font-semibold">Profile</span>
-            {activeTab === 'profile' && <div className="w-6 h-0.5 bg-white mt-1 rounded"></div>}
-          </button>
-
-          <Button
-            onClick={handleSignOut}
-            variant="ghost"
-            size="sm"
-            className="text-white hover:bg-green-700 border border-white ml-2"
-          >
-            <LogOut size={16} />
-          </Button>
-        </div>
-      </nav>
     </div>
   );
 };
