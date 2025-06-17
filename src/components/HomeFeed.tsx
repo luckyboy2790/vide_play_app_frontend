@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { Heart, Bookmark, Share, MessageCircle, User, Plus } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
@@ -84,6 +85,23 @@ const HomeFeed = () => {
 
   return (
     <div className="relative h-screen overflow-hidden bg-black">
+      {/* Header with centered For You Plays and top-right FAB */}
+      <header className="absolute top-0 left-0 right-0 z-20 px-4 py-3 bg-transparent">
+        <div className="flex justify-between items-center">
+          <div className="flex-1 flex justify-center">
+            <button className="text-white font-bold text-lg border-b-2 border-white pb-1">
+              For You Plays
+            </button>
+          </div>
+          <button
+            onClick={() => navigate('/shared-play-preview')}
+            className="w-10 h-10 bg-green-600 hover:bg-green-700 text-white rounded-full shadow-lg flex items-center justify-center transition-colors opacity-80"
+          >
+            <Plus size={18} />
+          </button>
+        </div>
+      </header>
+
       {/* Full Screen Play Card */}
       <div className="absolute inset-0">
         {/* Video Background */}
@@ -216,14 +234,6 @@ const HomeFeed = () => {
         className="absolute bottom-20 left-0 right-0 h-1/2 cursor-pointer z-10"
         onClick={() => handleSwipe('up')}
       />
-
-      {/* Floating Action Button */}
-      <button
-        onClick={() => navigate('/shared-play-preview')}
-        className="fixed bottom-24 right-4 w-14 h-14 bg-green-600 hover:bg-green-700 text-white rounded-full shadow-lg flex items-center justify-center z-20 transition-colors"
-      >
-        <Plus size={24} />
-      </button>
     </div>
   );
 };

@@ -48,26 +48,7 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-black max-w-sm mx-auto relative">
-      {/* Header with For You Plays tab */}
-      {activeTab === 'home' && (
-        <header className="absolute top-0 left-0 right-0 z-20 px-4 py-3 bg-transparent">
-          <div className="flex justify-between items-center">
-            <button className="text-white font-bold text-lg border-b-2 border-white pb-1">
-              For You Plays
-            </button>
-            <Button
-              onClick={handleSignOut}
-              variant="ghost"
-              size="sm"
-              className="text-white hover:bg-gray-800"
-            >
-              <LogOut size={16} />
-            </Button>
-          </div>
-        </header>
-      )}
-
-      {/* Header for other tabs */}
+      {/* Header for other tabs (not home) */}
       {activeTab !== 'home' && (
         <header className="bg-white border-b border-gray-200 px-4 py-3 sticky top-0 z-10">
           <div className="flex justify-between items-center">
