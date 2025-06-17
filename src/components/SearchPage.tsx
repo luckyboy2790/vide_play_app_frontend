@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Search } from 'lucide-react';
 import { Input } from '@/components/ui/input';
@@ -8,15 +9,7 @@ const SearchPage = () => {
   const [searchQuery, setSearchQuery] = useState('');
 
   return (
-    <div className="h-full flex flex-col px-4 overflow-hidden relative">
-      {/* Main Header */}
-      <div className="flex items-center justify-center py-4 bg-green-700 relative z-10">
-        <Search className="mr-2 h-6 w-6 text-white" />
-        <h1 className="text-white text-xl font-bold" style={{ fontFamily: 'Georgia, serif' }}>
-          SEARCH PLAYS
-        </h1>
-      </div>
-
+    <div className="h-full flex flex-col px-4 overflow-hidden relative bg-green-700">
       {/* Floating Search Bar */}
       <div className="px-4 py-4 relative z-10">
         <div className="relative max-w-md mx-auto">
