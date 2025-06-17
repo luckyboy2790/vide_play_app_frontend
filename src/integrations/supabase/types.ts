@@ -13,36 +13,36 @@ export type Database = {
         Row: {
           caption: string | null
           created_at: string
-          formation: string
+          formation: string | null
           id: number
           play_type: string | null
           shared_by: string | null
           tags: string[]
-          thumbnail_url: string
+          thumbnail_url: string | null
           user_id: string | null
           video_url: string
         }
         Insert: {
           caption?: string | null
           created_at?: string
-          formation: string
+          formation?: string | null
           id?: number
           play_type?: string | null
           shared_by?: string | null
           tags: string[]
-          thumbnail_url: string
+          thumbnail_url?: string | null
           user_id?: string | null
           video_url: string
         }
         Update: {
           caption?: string | null
           created_at?: string
-          formation?: string
+          formation?: string | null
           id?: number
           play_type?: string | null
           shared_by?: string | null
           tags?: string[]
-          thumbnail_url?: string
+          thumbnail_url?: string | null
           user_id?: string | null
           video_url?: string
         }

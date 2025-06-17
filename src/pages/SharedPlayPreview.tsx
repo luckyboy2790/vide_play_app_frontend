@@ -55,16 +55,16 @@ const SharedPlayPreview = () => {
         return;
       }
 
-      // Insert into Supabase plays table
+      // Insert into Supabase plays table with proper default values
       const { error } = await supabase
         .from('plays')
         .insert({
           video_url: video_url,
           caption: caption,
           play_type: playType,
-          formation: null,
+          formation: '', // Use empty string instead of null
           tags: [],
-          thumbnail_url: null,
+          thumbnail_url: '', // Use empty string instead of null
           shared_by: platform,
           user_id: user.id
         });
