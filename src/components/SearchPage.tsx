@@ -5,9 +5,9 @@ import SearchBySection from './SearchBySection';
 
 const SearchPage = () => {
   return (
-    <div className="p-4 relative">
+    <div className="h-full flex flex-col justify-center items-center px-4 overflow-hidden">
       {/* Search By Section */}
-      <div className="mb-8">
+      <div className="w-full max-w-md">
         <SearchHeader />
         <SearchBySection />
       </div>

@@ -94,8 +94,8 @@ const ProfilePage = () => {
 
   if (loading) {
     return (
-      <div className="p-4 pb-20">
-        <div className="text-center py-12">
+      <div className="h-full flex items-center justify-center">
+        <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600 mx-auto mb-4"></div>
           <p className="text-gray-600">Loading profile...</p>
         </div>
@@ -104,40 +104,40 @@ const ProfilePage = () => {
   }
 
   return (
-    <div className="p-4 pb-20 space-y-6">
+    <div className="h-full flex flex-col p-4 overflow-hidden">
       {/* Profile Header with Settings */}
-      <div className="bg-white rounded-lg shadow-md p-6 border border-gray-200 relative">
-        <button className="absolute top-4 right-4 p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition-colors">
-          <Settings size={20} />
+      <div className="bg-white rounded-lg shadow-md p-4 border border-gray-200 relative flex-shrink-0 mb-4">
+        <button className="absolute top-3 right-3 p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition-colors">
+          <Settings size={18} />
         </button>
-        <div className="flex items-center space-x-4">
-          <div className="w-16 h-16 bg-green-600 rounded-full flex items-center justify-center">
-            <User size={32} className="text-white" />
+        <div className="flex items-center space-x-3">
+          <div className="w-12 h-12 bg-green-600 rounded-full flex items-center justify-center">
+            <User size={24} className="text-white" />
           </div>
           <div>
-            <h2 className="text-xl font-bold text-gray-900">Coach Will</h2>
+            <h2 className="text-lg font-bold text-gray-900">Coach Will</h2>
           </div>
         </div>
       </div>
 
       {/* Playbook Section */}
-      <div className="bg-white rounded-lg shadow-md p-6 border border-gray-200">
-        <h3 className="text-lg font-semibold text-gray-900 mb-2">Playbook - {userPlays.length} plays</h3>
+      <div className="bg-white rounded-lg shadow-md p-4 border border-gray-200 flex-shrink-0 mb-4">
+        <h3 className="text-base font-semibold text-gray-900">Playbook - {userPlays.length} plays</h3>
       </div>
 
       {/* Favorite Formation & Play Type Grid */}
-      <div className="grid grid-cols-2 gap-4">
-        <div className="bg-white rounded-lg shadow-md p-6 border border-gray-200">
+      <div className="grid grid-cols-2 gap-3 flex-1">
+        <div className="bg-white rounded-lg shadow-md p-4 border border-gray-200 flex flex-col">
           <h4 className="text-sm font-medium text-gray-600 mb-2">Favorite Formation</h4>
-          <div className="bg-gray-100 rounded-lg p-4 flex items-center justify-center min-h-[60px]">
-            <span className="text-lg font-bold text-gray-800">{favoriteFormation}</span>
+          <div className="bg-gray-100 rounded-lg p-3 flex items-center justify-center flex-1 min-h-[50px]">
+            <span className="text-base font-bold text-gray-800">{favoriteFormation}</span>
           </div>
         </div>
 
-        <div className="bg-white rounded-lg shadow-md p-6 border border-gray-200">
+        <div className="bg-white rounded-lg shadow-md p-4 border border-gray-200 flex flex-col">
           <h4 className="text-sm font-medium text-gray-600 mb-2">Favorite Play Type</h4>
-          <div className="bg-gray-100 rounded-lg p-4 flex items-center justify-center min-h-[60px]">
-            <span className="text-lg font-bold text-gray-800">{favoritePlayType}</span>
+          <div className="bg-gray-100 rounded-lg p-3 flex items-center justify-center flex-1 min-h-[50px]">
+            <span className="text-base font-bold text-gray-800">{favoritePlayType}</span>
           </div>
         </div>
       </div>

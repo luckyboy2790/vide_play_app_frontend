@@ -115,7 +115,7 @@ const HomeFeed = () => {
 
   if (loading) {
     return (
-      <div className="h-screen bg-black flex items-center justify-center">
+      <div className="h-full flex items-center justify-center bg-black">
         <div className="text-white text-center">
           <p className="text-lg">Loading plays...</p>
         </div>
@@ -125,7 +125,7 @@ const HomeFeed = () => {
 
   if (plays.length === 0) {
     return (
-      <div className="h-screen bg-black flex items-center justify-center">
+      <div className="h-full flex items-center justify-center bg-black">
         <div className="text-white text-center">
           <p className="text-lg">No plays available</p>
           <p className="text-sm opacity-75 mt-2">Create your first play to get started!</p>
@@ -137,7 +137,7 @@ const HomeFeed = () => {
   const currentPlay = plays[currentIndex];
 
   return (
-    <div className="relative h-screen overflow-hidden bg-black">
+    <div className="relative h-full overflow-hidden bg-black">
       {/* Header with centered For You Plays and top-right FAB */}
       <header className="absolute top-0 left-0 right-0 z-20 px-4 py-3 bg-transparent">
         <div className="flex justify-between items-center">
@@ -179,7 +179,7 @@ const HomeFeed = () => {
         </div>
 
         {/* Right Side Actions */}
-        <div className="absolute right-4 bottom-32 flex flex-col items-center space-y-6">
+        <div className="absolute right-4 bottom-24 flex flex-col items-center space-y-4">
           {/* Profile Avatar */}
           <div className="relative">
             <div className="w-12 h-12 bg-gray-600 rounded-full flex items-center justify-center border-2 border-white">
@@ -197,7 +197,7 @@ const HomeFeed = () => {
               className="w-12 h-12 flex items-center justify-center"
             >
               <Heart 
-                size={32} 
+                size={28} 
                 className={currentPlay.liked ? 'text-red-500 fill-red-500' : 'text-white'} 
               />
             </button>
@@ -209,7 +209,7 @@ const HomeFeed = () => {
           {/* Comment Button */}
           <div className="flex flex-col items-center">
             <button className="w-12 h-12 flex items-center justify-center">
-              <MessageCircle size={32} className="text-white" />
+              <MessageCircle size={28} className="text-white" />
             </button>
             <span className="text-white text-xs font-semibold mt-1">12</span>
           </div>
@@ -221,7 +221,7 @@ const HomeFeed = () => {
               className="w-12 h-12 flex items-center justify-center"
             >
               <Bookmark 
-                size={32} 
+                size={28} 
                 className={currentPlay.saved ? 'text-yellow-400 fill-yellow-400' : 'text-white'} 
               />
             </button>
@@ -231,26 +231,26 @@ const HomeFeed = () => {
           {/* Share Button */}
           <div className="flex flex-col items-center">
             <button className="w-12 h-12 flex items-center justify-center">
-              <Share size={32} className="text-white" />
+              <Share size={28} className="text-white" />
             </button>
             <span className="text-white text-xs font-semibold mt-1">Share</span>
           </div>
         </div>
 
         {/* Bottom Info Overlay - positioned with proper spacing from nav bar */}
-        <div className="absolute bottom-28 left-0 right-0 p-4 bg-gradient-to-t from-black/80 to-transparent">
+        <div className="absolute bottom-20 left-0 right-0 p-4 bg-gradient-to-t from-black/80 to-transparent">
           <div className="mb-2">
             <div className="flex items-center mb-2">
-              <span className="text-white font-semibold text-lg">@{currentPlay.shared_by}</span>
+              <span className="text-white font-semibold text-base">@{currentPlay.shared_by}</span>
               <span className="text-white ml-2">•</span>
               <span className="text-white ml-2 text-sm">Follow</span>
             </div>
             
-            <p className="text-white text-sm mb-3 leading-relaxed">
+            <p className="text-white text-sm mb-2 leading-relaxed">
               {currentPlay.description || currentPlay.caption}
             </p>
 
-            <div className="flex flex-wrap gap-2 mb-3">
+            <div className="flex flex-wrap gap-2 mb-2">
               {currentPlay.tags.map((tag, index) => (
                 <span
                   key={index}
@@ -275,7 +275,7 @@ const HomeFeed = () => {
           {plays.map((_, index) => (
             <div
               key={index}
-              className={`w-1 h-6 rounded-full transition-colors ${
+              className={`w-1 h-4 rounded-full transition-colors ${
                 index === currentIndex ? 'bg-white' : 'bg-white/30'
               }`}
             />
@@ -289,7 +289,7 @@ const HomeFeed = () => {
         onClick={() => handleSwipe('down')}
       />
       <div
-        className="absolute bottom-28 left-0 right-0 h-1/2 cursor-pointer z-10"
+        className="absolute bottom-20 left-0 right-0 h-1/2 cursor-pointer z-10"
         onClick={() => handleSwipe('up')}
       />
     </div>
