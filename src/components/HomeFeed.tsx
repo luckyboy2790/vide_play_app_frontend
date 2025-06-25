@@ -200,7 +200,7 @@ const HomeFeed = () => {
             {plays.map((play, index) => (
               <div
                 key={play.id}
-                className="snap-start w-full h-screen flex items-center justify-center bg-gradient-to-b from-gray-800 to-gray-900"
+                className="w-full h-screen snap-start flex justify-center items-center"
                 onPointerDown={(e) => {
                   setDragStartY(e.clientY);
                   setDragMoved(false);
@@ -222,33 +222,29 @@ const HomeFeed = () => {
                   setIsDragging(false);
                 }}
               >
-                <div className="text-white text-center max-w-md w-full">
-                  <div className="relative mb-4 rounded-lg overflow-hidden">
+                <div className="text-white text-center max-w-md w-full h-full">
+                  <div className="relative w-full h-full">
                     <ReactPlayer
                       url={play.video_url}
                       playing={index === currentIndex && isPlaying}
-                      controls
+                      loop
+                      muted
+                      controls={false}
                       width="100%"
                       height="100%"
                       style={{
-                        borderRadius: "0.5rem",
-                        overflow: "hidden",
+                        position: "absolute",
+                        top: 0,
+                        left: 0,
+                        objectFit: "cover",
+                      }}
+                      onClick={() => {
+                        if (index === currentIndex) {
+                          setIsPlaying((prev) => !prev);
+                        }
                       }}
                     />
                   </div>
-
-                  <p className="text-lg font-medium">Play Preview</p>
-
-                  {play.play_type && (
-                    <div className="mt-2 px-3 py-1 bg-green-600 rounded-full text-xs font-medium inline-block">
-                      {play.play_type.toUpperCase()}
-                    </div>
-                  )}
-                  {play.formation && (
-                    <div className="mt-1 px-3 py-1 bg-blue-600 rounded-full text-xs font-medium inline-block ml-2">
-                      {play.formation.toUpperCase()}
-                    </div>
-                  )}
                 </div>
               </div>
             ))}
@@ -257,6 +253,18 @@ const HomeFeed = () => {
 
         <div className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black/80 to-transparent">
           <div className="mb-2">
+            <div className="flex flex-wrap gap-2 mb-2">
+              {currentPlay.play_type && (
+                <div className="mt-2 px-3 py-1 bg-green-600 rounded-full text-xs font-medium inline-block">
+                  {currentPlay.play_type.toUpperCase()}
+                </div>
+              )}
+              {currentPlay.formation && (
+                <div className="flex justify-center items-center mt-1 px-3 py-1 bg-blue-600 rounded-full text-xs font-medium ml-2">
+                  {currentPlay.formation.toUpperCase()}
+                </div>
+              )}
+            </div>
             <div className="flex flex-wrap gap-2 mb-2">
               {currentPlay.tags.map((tag, index) => (
                 <span key={index} className="text-white text-sm">
