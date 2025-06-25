@@ -223,7 +223,7 @@ const HomeFeed = () => {
                 }}
               >
                 <div className="text-white text-center max-w-md w-full h-full">
-                  <div className="relative w-full h-full">
+                  <div className="relative w-full h-full overflow-hidden">
                     <ReactPlayer
                       url={play.video_url}
                       playing={index === currentIndex && isPlaying}

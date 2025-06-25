@@ -1,29 +1,35 @@
+import { useState } from "react";
+import { useNavigate, useSearchParams } from "react-router-dom";
+import { Save } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
+import SharedPlayHeader from "@/components/SharedPlayHeader";
+import VideoPreview from "@/components/VideoPreview";
+import CaptionDisplay from "@/components/CaptionDisplay";
+import PlayForm from "@/components/PlayForm";
+import { useCookies } from "react-cookie";
 
-import { useState } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
-import { Save } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { useToast } from '@/hooks/use-toast';
-import { supabase } from '@/integrations/supabase/client';
-import SharedPlayHeader from '@/components/SharedPlayHeader';
-import VideoPreview from '@/components/VideoPreview';
-import CaptionDisplay from '@/components/CaptionDisplay';
-import PlayForm from '@/components/PlayForm';
+const API_URL = import.meta.env.VITE_BACKEND_URL;
 
 const SharedPlayPreview = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const { toast } = useToast();
-  
-  const initialVideoUrl = searchParams.get('video_url') || '';
-  const initialCaption = searchParams.get('caption') || '';
-  const platform = searchParams.get('platform') || '';
-  
+
+  const initialVideoUrl = searchParams.get("video_url") || "";
+  const initialCaption = searchParams.get("caption") || "";
+  const platform = searchParams.get("platform") || "";
+
   const [video_url, setVideo_url] = useState<string>(initialVideoUrl);
   const [caption, setCaption] = useState<string>(initialCaption);
-  const [playType, setPlayType] = useState<string>('');
-  const [formation, setFormation] = useState<string>('');
+  const [playType, setPlayType] = useState<string>("");
+  const [formation, setFormation] = useState<string>("");
   const [isLoading, setIsLoading] = useState(false);
+
+  const [cookies] = useCookies(["authToken"]);
+
+  const token = cookies.authToken;
 
   const handleSavePlay = async () => {
     if (!playType || !formation) {
@@ -38,35 +44,23 @@ const SharedPlayPreview = () => {
     setIsLoading(true);
 
     try {
-      // Get current user
-      const { data: { user } } = await supabase.auth.getUser();
-      
-      if (!user) {
-        toast({
-          title: "Authentication required",
-          description: "Please log in to save plays.",
-          variant: "destructive",
-        });
-        setIsLoading(false);
-        return;
-      }
-
-      // Insert into Supabase plays table
-      const { error } = await supabase
-        .from('plays')
-        .insert({
-          video_url: video_url,
-          caption: caption,
-          play_type: playType,
+      const response = await fetch(`${API_URL}/api/plays`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          url: video_url,
           formation: formation,
-          tags: [],
-          thumbnail_url: '', // Use empty string instead of null
-          shared_by: platform,
-          user_id: user.id
-        });
+          type: playType,
+          caption: caption,
+        }),
+      });
 
-      if (error) {
-        console.error('Error saving play:', error);
+      if (!response.ok) {
+        const result = await response.json();
+        console.error("Error saving play:", result);
         toast({
           title: "Error saving play",
           description: "There was an error saving your play. Please try again.",
@@ -81,10 +75,9 @@ const SharedPlayPreview = () => {
         description: "Your play has been successfully saved.",
       });
 
-      // Navigate back to home
-      navigate('/');
+      navigate("/");
     } catch (error) {
-      console.error('Unexpected error:', error);
+      console.error("Unexpected error:", error);
       toast({
         title: "Error saving play",
         description: "There was an unexpected error. Please try again.",
@@ -111,7 +104,7 @@ const SharedPlayPreview = () => {
           setFormation={setFormation}
         />
 
-        <VideoPreview platform={platform} />
+        <VideoPreview videoUrl={video_url} />
 
         <CaptionDisplay caption={caption} />
 
@@ -123,7 +116,7 @@ const SharedPlayPreview = () => {
           size="lg"
         >
           <Save size={20} className="mr-2" />
-          {isLoading ? 'Saving Play...' : 'Save Play'}
+          {isLoading ? "Saving Play..." : "Save Play"}
         </Button>
       </div>
     </div>

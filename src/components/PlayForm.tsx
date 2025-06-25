@@ -1,7 +1,13 @@
-
-import { Input } from '@/components/ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { playTypes, formations } from '@/constants/playOptions';
+import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { playTypes, formations } from "@/constants/playOptions";
+import { Textarea } from "./ui/textarea";
 
 interface PlayFormProps {
   video_url: string;
@@ -45,8 +51,7 @@ const PlayForm = ({
         <label className="block text-sm font-medium text-gray-700 mb-2">
           Caption
         </label>
-        <Input
-          type="text"
+        <Textarea
           placeholder="Enter caption..."
           value={caption}
           onChange={(e) => setCaption(e.target.value)}
