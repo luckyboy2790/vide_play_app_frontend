@@ -1,73 +1,40 @@
-# Welcome to your Lovable project
+# Video Play Management Frontend
 
-## Project info
+A responsive authentication UI built with **React**, **TypeScript**, and **TailwindCSS**, integrated with a custom **Express + PostgreSQL** backend for user management.
 
-**URL**: https://lovable.dev/projects/614a4788-4bc7-4d1c-8a65-74e1712996c2
+---
 
-## How can I edit this code?
+## ✨ Features
 
-There are several ways of editing your application.
+- User Registration and Login
+- JWT-based Authentication (stored in cookies)
+- Password visibility toggle
+- Inline error & success toasts
+- Persistent login with profile fetch
+- Form validation and loading states
+- Auth context with React hooks
 
-**Use Lovable**
+---
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/614a4788-4bc7-4d1c-8a65-74e1712996c2) and start prompting.
+## 🔧 Stack
 
-Changes made via Lovable will be committed automatically to this repo.
+### Frontend:
+- [React](https://react.dev/)
+- [TypeScript](https://www.typescriptlang.org/)
+- [TailwindCSS](https://tailwindcss.com/)
+- [React Router](https://reactrouter.com/)
+- [React Cookie](https://www.npmjs.com/package/react-cookie)
+- Custom Toast Hook
 
-**Use your preferred IDE**
+### Backend:
+- [Express](https://expressjs.com/)
+- [PostgreSQL](https://www.postgresql.org/)
+- [JWT](https://jwt.io/) for authentication
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+---
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+## 🧠 Architecture Overview
 
-Follow these steps:
-
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
-
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
-
-# Step 3: Install the necessary dependencies.
-npm i
-
-# Step 4: Start the development server with auto-reloading and an instant preview.
-npm run dev
-```
-
-**Edit a file directly in GitHub**
-
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
-
-**Use GitHub Codespaces**
-
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
-
-## What technologies are used for this project?
-
-This project is built with:
-
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
-
-## How can I deploy this project?
-
-Simply open [Lovable](https://lovable.dev/projects/614a4788-4bc7-4d1c-8a65-74e1712996c2) and click on Share -> Publish.
-
-## Can I connect a custom domain to my Lovable project?
-
-Yes, you can!
-
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
-
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/tips-tricks/custom-domain#step-by-step-guide)
+```txt
+[React UI] → [AuthContext] → [Express API]
+         ↘ (Cookies)      ↘ (JWT in Headers)
