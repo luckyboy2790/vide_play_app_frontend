@@ -1,3 +1,4 @@
+import { useToast } from "@/hooks/use-toast";
 import React, {
   createContext,
   useCallback,
@@ -6,6 +7,7 @@ import React, {
   useReducer,
 } from "react";
 import { useCookies } from "react-cookie";
+import { useNavigate } from "react-router-dom";
 
 const API_URL = import.meta.env.VITE_BACKEND_URL;
 
@@ -50,6 +52,10 @@ const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 
   const [cookies, setCookie, removeCookie] = useCookies();
 
+  const navigate = useNavigate();
+
+  const { toast } = useToast();
+
   const signUp = async (email: string, password: string, username: string) => {
     try {
       const res = await fetch(`${API_URL}/api/users/register`, {
@@ -58,7 +64,17 @@ const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         body: JSON.stringify({ email, password, username }),
       });
 
-      if (!res.ok) throw new Error("Failed to register");
+      if (!res.ok) {
+        const result = await res.json();
+
+        toast({
+          title: "Something went wrong",
+          description: result.message,
+          variant: "destructive",
+        });
+
+        return;
+      }
 
       const result = await res.json();
 
@@ -71,6 +87,13 @@ const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       setCookie("authToken", authToken, {
         path: "/",
         maxAge: expires_in,
+      });
+
+      navigate("/");
+
+      toast({
+        title: "Account created!",
+        description: "Account is created successfully!",
       });
 
       dispatch({ type: "LOGIN_SUCCESS", payload: { user } });
@@ -92,7 +115,17 @@ const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         body: JSON.stringify({ email, password }),
       });
 
-      if (!res.ok) throw new Error("Login failed");
+      if (!res.ok) {
+        const result = await res.json();
+
+        toast({
+          title: "Login failed",
+          description: result.message,
+          variant: "destructive",
+        });
+
+        return;
+      }
 
       const result = await res.json();
 
@@ -105,6 +138,13 @@ const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       setCookie("authToken", authToken, {
         path: "/",
         maxAge: expires_in,
+      });
+
+      navigate("/");
+
+      toast({
+        title: "Welcome back!",
+        description: "You've been logged in successfully.",
       });
 
       dispatch({ type: "LOGIN_SUCCESS", payload: { user } });

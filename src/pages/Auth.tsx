@@ -42,19 +42,6 @@ const Auth = () => {
       const response = isLogin
         ? await signIn(email, password)
         : await signUp(email, password, username);
-
-      if (isLogin) {
-        toast({
-          title: "Welcome back!",
-          description: "You've been logged in successfully.",
-        });
-        navigate("/");
-      } else {
-        toast({
-          title: "Account created!",
-          description: "Please check your email to verify your account.",
-        });
-      }
     } catch (error) {
       console.error("Unexpected auth error:", error);
       toast({
