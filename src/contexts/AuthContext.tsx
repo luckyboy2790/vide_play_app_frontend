@@ -1,83 +1,166 @@
+import React, {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useReducer,
+} from "react";
+import { useCookies } from "react-cookie";
 
-import React, { createContext, useContext, useEffect, useState } from 'react';
-import { User, Session } from '@supabase/supabase-js';
-import { supabase } from '@/integrations/supabase/client';
+const API_URL = import.meta.env.VITE_BACKEND_URL;
 
 interface AuthContextType {
-  user: User | null;
-  session: Session | null;
+  user: any;
   loading: boolean;
-  signUp: (email: string, password: string) => Promise<{ error: any }>;
-  signIn: (email: string, password: string) => Promise<{ error: any }>;
-  signOut: () => Promise<void>;
+  errorMessage: string | null;
+  signUp: (email: string, password: string, username: string) => Promise<void>;
+  signIn: (email: string, password: string) => Promise<void>;
+  signOut: () => void;
 }
+
+const initialState = {
+  user: null,
+  loading: true,
+  errorMessage: null,
+};
+
+const reducer = (state: any, action: any) => {
+  switch (action.type) {
+    case "INIT":
+      return { ...state, user: action.payload.user, loading: false };
+    case "LOGIN_SUCCESS":
+      return { ...state, user: action.payload.user, loading: false };
+    case "LOGOUT":
+      return { ...state, user: null };
+    case "ERROR":
+      return { ...state, errorMessage: action.payload, loading: false };
+    case "CLEAR_ERROR":
+      return { ...state, errorMessage: null };
+    default:
+      return state;
+  }
+};
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-export const useAuth = () => {
-  const context = useContext(AuthContext);
-  if (context === undefined) {
-    throw new Error('useAuth must be used within an AuthProvider');
-  }
-  return context;
-};
+const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
+  children,
+}) => {
+  const [state, dispatch] = useReducer(reducer, initialState);
 
-export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [user, setUser] = useState<User | null>(null);
-  const [session, setSession] = useState<Session | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [cookies, setCookie, removeCookie] = useCookies();
 
-  useEffect(() => {
-    // Set up auth state listener
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (event, session) => {
-        console.log('Auth state changed:', event, session?.user?.email);
-        setSession(session);
-        setUser(session?.user ?? null);
-        setLoading(false);
-      }
-    );
+  const signUp = async (email: string, password: string, username: string) => {
+    try {
+      const res = await fetch(`${API_URL}/api/users/register`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password, username }),
+      });
 
-    // Check for existing session
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      console.log('Initial session:', session?.user?.email);
-      setSession(session);
-      setUser(session?.user ?? null);
-      setLoading(false);
-    });
+      if (!res.ok) throw new Error("Failed to register");
 
-    return () => subscription.unsubscribe();
-  }, []);
+      const result = await res.json();
 
-  const signUp = async (email: string, password: string) => {
-    const redirectUrl = `${window.location.origin}/`;
-    
-    const { error } = await supabase.auth.signUp({
-      email,
-      password,
-      options: {
-        emailRedirectTo: redirectUrl
-      }
-    });
-    return { error };
+      const authToken = result.token;
+
+      const user = result.user;
+
+      const expires_in = 86400;
+
+      setCookie("authToken", authToken, {
+        path: "/",
+        maxAge: expires_in,
+      });
+
+      dispatch({ type: "LOGIN_SUCCESS", payload: { user } });
+
+      return user;
+    } catch (error: any) {
+      dispatch({ type: "ERROR", payload: error.message });
+    }
   };
 
   const signIn = async (email: string, password: string) => {
-    const { error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
-    return { error };
+    try {
+      console.log(email, password);
+
+      const res = await fetch(`${API_URL}/api/users/login`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({ email, password }),
+      });
+
+      if (!res.ok) throw new Error("Login failed");
+
+      const result = await res.json();
+
+      const user = result.user;
+
+      const authToken = result.token;
+
+      const expires_in = 86400;
+
+      setCookie("authToken", authToken, {
+        path: "/",
+        maxAge: expires_in,
+      });
+
+      dispatch({ type: "LOGIN_SUCCESS", payload: { user } });
+    } catch (error: any) {
+      dispatch({ type: "ERROR", payload: error.message });
+    }
   };
 
-  const signOut = async () => {
-    await supabase.auth.signOut();
+  const signOut = useCallback(() => {
+    dispatch({ type: "LOGOUT" });
+
+    removeCookie("authToken");
+  }, [removeCookie]);
+
+  const getProfile = async () => {
+    try {
+      const token = cookies.authToken;
+
+      if (token) {
+        const res = await fetch(`${API_URL}/api/users/profile`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        if (!res.ok) {
+          dispatch({ type: "INIT", payload: { user: null } });
+
+          signOut();
+
+          return;
+        }
+
+        const result = await res.json();
+
+        console.log(result);
+
+        const user = result.user;
+
+        dispatch({ type: "INIT", payload: { user } });
+      } else {
+        dispatch({ type: "INIT", payload: { user: null } });
+      }
+    } catch {
+      dispatch({ type: "INIT", payload: { user: null } });
+    }
   };
 
-  const value = {
-    user,
-    session,
-    loading,
+  useEffect(() => {
+    getProfile();
+  }, []);
+
+  const value: AuthContextType = {
+    user: state.user,
+    loading: state.loading,
+    errorMessage: state.errorMessage,
     signUp,
     signIn,
     signOut,
@@ -85,3 +168,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };
+
+function useAuth(): AuthContextType {
+  const context = useContext(AuthContext);
+  if (!context) throw new Error("useAuth must be used within an AuthProvider");
+  return context;
+}
+
+export { AuthProvider, useAuth };
