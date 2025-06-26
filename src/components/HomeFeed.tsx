@@ -75,6 +75,7 @@ const HomeFeed = () => {
   }, [toast]);
 
   const handleSwipe = (direction: "up" | "down") => {
+    setIsPlaying(false);
     if (direction === "up" && currentIndex < plays.length - 1) {
       setCurrentIndex(currentIndex + 1);
     } else if (direction === "down" && currentIndex > 0) {
@@ -224,26 +225,32 @@ const HomeFeed = () => {
               >
                 <div className="text-white text-center max-w-md w-full h-full">
                   <div className="relative w-full h-full overflow-hidden">
-                    <ReactPlayer
-                      url={play.video_url}
-                      playing={index === currentIndex && isPlaying}
-                      loop
-                      muted
-                      controls={false}
-                      width="100%"
-                      height="100%"
-                      style={{
-                        position: "absolute",
-                        top: 0,
-                        left: 0,
-                        objectFit: "cover",
-                      }}
-                      onClick={() => {
-                        if (index === currentIndex) {
-                          setIsPlaying((prev) => !prev);
-                        }
-                      }}
-                    />
+                    <div
+                      className={`absolute top-0 left-0 w-full h-full transition-opacity duration-700 ease-in-out ${
+                        index === currentIndex
+                          ? "opacity-100 z-10"
+                          : "opacity-0 z-0 pointer-events-none"
+                      }`}
+                    >
+                      {index === currentIndex && (
+                        <ReactPlayer
+                          url={play.video_url}
+                          playing={isPlaying}
+                          loop
+                          muted
+                          controls={false}
+                          width="100%"
+                          height="100%"
+                          style={{
+                            position: "absolute",
+                            top: 0,
+                            left: 0,
+                            objectFit: "cover",
+                          }}
+                          onClick={() => setIsPlaying((prev) => !prev)}
+                        />
+                      )}
+                    </div>
                   </div>
                 </div>
               </div>
