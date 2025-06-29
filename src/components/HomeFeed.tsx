@@ -5,6 +5,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Play } from "@/types/play";
 import { useCookies } from "react-cookie";
 import ReactPlayer from "react-player";
+import { LuBookmark } from "react-icons/lu";
 
 const API_URL = import.meta.env.VITE_BACKEND_URL;
 
@@ -128,6 +129,38 @@ const HomeFeed = () => {
     }
   }, [currentIndex]);
 
+  const handleSave = async () => {
+    try {
+      const response = await fetch(`${API_URL}/api/user_playbook`, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          play_id: parseInt(plays[currentIndex].id),
+        }),
+      });
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        throw new Error(result.message || "Something went wrong");
+      }
+
+      toast({
+        title: "Play saved!",
+        description: "Your play has been successfully saved.",
+      });
+    } catch (error) {
+      toast({
+        title: "Error saving play",
+        description: error.message,
+        variant: "destructive",
+      });
+    }
+  };
+
   if (loading) {
     return (
       <div className="h-full flex items-center justify-center bg-black">
@@ -201,7 +234,7 @@ const HomeFeed = () => {
             {plays.map((play, index) => (
               <div
                 key={play.id}
-                className="w-full h-screen snap-start flex justify-center items-center"
+                className="w-full h-screen snap-start flex relative justify-center items-center"
                 onPointerDown={(e) => {
                   setDragStartY(e.clientY);
                   setDragMoved(false);
@@ -259,6 +292,13 @@ const HomeFeed = () => {
         </div>
 
         <div className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black/80 to-transparent">
+          <div
+            className="absolute w-10 h-10 right-1 z-50 top-5"
+            onClick={handleSave}
+          >
+            <LuBookmark className="size-6 cursor-pointer text-white" />
+          </div>
+
           <div className="mb-2">
             <div className="flex flex-wrap gap-2 mb-2">
               {currentPlay.play_type && (

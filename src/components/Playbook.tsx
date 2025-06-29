@@ -134,10 +134,10 @@ const Playbook = () => {
   const currentPlay = flattenedPlays[currentIndex];
 
   return (
-    <div className="h-screen flex flex-col justify-center p-4 overflow-hidden relative">
+    <div className="h-screen flex flex-col justify-center overflow-hidden relative">
       <div className="relative overflow-hidden h-full">
         {currentPlay?.formationDiagram && (
-          <div className="absolute top-12 right-0 z-50">
+          <div className="absolute top-16 right-0 z-50">
             <p className="text-white text-center text-lg font-bold">
               {currentPlay.formation}
             </p>
