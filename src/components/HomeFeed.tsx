@@ -270,8 +270,8 @@ const HomeFeed = () => {
                           url={play.video_url}
                           playing={isPlaying}
                           loop
-                          muted
                           controls={false}
+                          muted={false}
                           width="100%"
                           height="100%"
                           style={{

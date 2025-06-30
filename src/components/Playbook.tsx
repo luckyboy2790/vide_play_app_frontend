@@ -3,6 +3,8 @@ import { useCookies } from "react-cookie";
 import { useToast } from "@/hooks/use-toast";
 import { Image } from "antd";
 import ReactPlayer from "react-player";
+import { Play } from "lucide-react";
+import { playTypes, formations } from "@/constants/playOptions";
 
 const API_URL = import.meta.env.VITE_BACKEND_URL;
 
@@ -15,22 +17,34 @@ const Playbook = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
-  const [dragStartY, setDragStartY] = useState<number | null>(null);
+  const [dragStartX, setDragStartX] = useState<number | null>(null);
   const [dragMoved, setDragMoved] = useState(false);
+  const [dropdownType, setDropdownType] = useState<
+    "formation" | "playType" | null
+  >(null);
+  const [dropdownPosition, setDropdownPosition] = useState<{
+    x: number;
+    y: number;
+  } | null>(null);
 
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const scrollTargetIndexRef = useRef<number | null>(null);
 
+  const [selectedFormation, setSelectedFormation] = useState<string | null>(
+    null
+  );
+  const [selectedPlayType, setSelectedPlayType] = useState<string | null>(null);
+
   const token = cookies.authToken;
 
-  const handleSwipe = (direction: "up" | "down") => {
+  const handleSwipe = (direction: "left" | "right") => {
     if (scrollTargetIndexRef.current !== null) return;
 
     setIsPlaying(false);
     let nextIndex = currentIndex;
-    if (direction === "up" && currentIndex < flattenedPlays.length - 1) {
+    if (direction === "left" && currentIndex < flattenedPlays.length - 1) {
       nextIndex += 1;
-    } else if (direction === "down" && currentIndex > 0) {
+    } else if (direction === "right" && currentIndex > 0) {
       nextIndex -= 1;
     }
 
@@ -42,8 +56,8 @@ const Playbook = () => {
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "ArrowUp") handleSwipe("down");
-      if (e.key === "ArrowDown") handleSwipe("up");
+      if (e.key === "ArrowRight") handleSwipe("left");
+      if (e.key === "ArrowLeft") handleSwipe("right");
     };
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
@@ -58,14 +72,14 @@ const Playbook = () => {
     const onScroll = () => {
       if (timeout) clearTimeout(timeout);
       timeout = setTimeout(() => {
-        const scrollTop = container.scrollTop;
-        const screenHeight = window.innerHeight;
-        let newIndex = Math.round(scrollTop / screenHeight);
+        const scrollLeft = container.scrollLeft;
+        const containerWidth = container.clientWidth;
+        let newIndex = Math.round(scrollLeft / containerWidth);
         newIndex = Math.max(0, Math.min(newIndex, flattenedPlays.length - 1));
 
         if (scrollTargetIndexRef.current !== null) {
-          const expectedTop = scrollTargetIndexRef.current * screenHeight;
-          if (Math.abs(expectedTop - scrollTop) < 2) {
+          const expectedLeft = scrollTargetIndexRef.current * containerWidth;
+          if (Math.abs(expectedLeft - scrollLeft) < 2) {
             scrollTargetIndexRef.current = null;
           } else return;
         }
@@ -86,42 +100,81 @@ const Playbook = () => {
   useEffect(() => {
     const container = scrollContainerRef.current;
     if (!container) return;
+    const width = container.clientWidth;
     container.scrollTo({
-      top: currentIndex * window.innerHeight,
+      left: currentIndex * width,
       behavior: "smooth",
     });
   }, [currentIndex]);
 
-  useEffect(() => {
-    const fetchPlays = async () => {
-      setLoading(true);
-      try {
-        const response = await fetch(`${API_URL}/api/user_playbook`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        const result = await response.json();
-        if (!response.ok) throw new Error();
+  const handleDropdownClick = (
+    type: "formation" | "playType",
+    e: React.MouseEvent<HTMLDivElement>
+  ) => {
+    e.stopPropagation();
 
-        const grouped = result.grouped_plays || {};
-        const flat: any[] = [];
-        for (const [formation, data] of Object.entries(grouped)) {
-          (data as any).plays.forEach((play: any) => {
-            flat.push({ ...play, formationDiagram: (data as any).diagramUrl });
-          });
-        }
-        setFlattenedPlays(flat);
-      } catch {
-        toast({
-          title: "Error",
-          description: "Could not load plays.",
-          variant: "destructive",
-        });
-      } finally {
-        setLoading(false);
-      }
+    const dropdownHeight = 144;
+    const footerHeight = 90;
+    const padding = 8;
+    const viewportHeight = window.innerHeight;
+
+    let top = e.pageY;
+    if (top + dropdownHeight + footerHeight > viewportHeight) {
+      top = top - dropdownHeight;
+    }
+
+    const left = type === "formation" ? e.pageX : e.pageX - 176;
+
+    setDropdownPosition({ x: left, y: top });
+    setDropdownType(type);
+  };
+
+  useEffect(() => {
+    const handleOutsideClick = () => {
+      setDropdownType(null);
     };
-    fetchPlays();
-  }, []);
+
+    if (dropdownType) {
+      window.addEventListener("click", handleOutsideClick);
+    }
+
+    return () => {
+      window.removeEventListener("click", handleOutsideClick);
+    };
+  }, [dropdownType]);
+
+  const fetchPlays = async (formation: string, playType: string) => {
+    setLoading(true);
+    try {
+      const response = await fetch(
+        `${API_URL}/api/user_playbook?formation=${formation}&playType=${playType}`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+      const result = await response.json();
+      if (!response.ok) throw new Error();
+
+      const diagramUrl = result.diagramUrl;
+      const plays = result.plays || [];
+
+      const flat = plays.map((play: any) => ({
+        ...play,
+        formationDiagram: diagramUrl,
+      }));
+
+      setFlattenedPlays(flat);
+      setCurrentIndex(0); // reset to first video
+    } catch {
+      toast({
+        title: "Error",
+        description: "Could not load plays.",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
 
   if (loading) {
     return (
@@ -134,74 +187,207 @@ const Playbook = () => {
   const currentPlay = flattenedPlays[currentIndex];
 
   return (
-    <div className="h-screen flex flex-col justify-center overflow-hidden relative">
-      <div className="relative overflow-hidden h-full">
-        {currentPlay?.formationDiagram && (
-          <div className="absolute top-16 right-0 z-50">
-            <p className="text-white text-center text-lg font-bold">
-              {currentPlay.formation}
-            </p>
-            <Image
-              src={currentPlay.formationDiagram}
-              alt="Formation Diagram"
-              width={120}
-              height={80}
-              style={{ objectFit: "contain" }}
-              preview={{ maskClassName: "bg-white/20" }}
-            />
-          </div>
-        )}
-
+    <div className="h-screen max-w-sm w-full mx-auto flex flex-col justify-start items-center overflow-hidden relative">
+      <h2
+        className="text-3xl font-bold text-white mb-4 relative pt-20"
+        style={{
+          fontFamily: "Georgia, serif",
+          textShadow: "3px 3px 6px rgba(0,0,0,0.8)",
+          transform: "rotate(-1deg)",
+        }}
+      >
+        PLAY OF THE DAY
         <div
-          ref={scrollContainerRef}
-          className={`flex-1 h-full w-full overflow-y-auto hide-scrollbar snap-y snap-mandatory ${
-            isDragging ? "select-none" : ""
-          }`}
-        >
-          {flattenedPlays.map((play, index) => (
-            <div
-              key={play.id}
-              className="w-full h-screen snap-start"
-              onPointerDown={(e) => {
-                setDragStartY(e.clientY);
-                setDragMoved(false);
-                setIsDragging(true);
-              }}
-              onPointerMove={(e) => {
-                if (dragStartY !== null && !dragMoved) {
-                  const deltaY = e.clientY - dragStartY;
-                  if (Math.abs(deltaY) > 50) {
-                    if (deltaY > 0) handleSwipe("down");
-                    else handleSwipe("up");
-                    setDragMoved(true);
+          className="absolute -bottom-2 left-1/2 transform -translate-x-1/2 w-48 h-1 bg-white opacity-70 rounded-full"
+          style={{ transform: "translateX(-50%) rotate(1deg)" }}
+        ></div>
+      </h2>
+
+      {flattenedPlays.length > 0 ? (
+        <div className="relative overflow-hidden w-full h-full flex flex-col justify-between items-center">
+          {currentPlay?.formationDiagram && (
+            <div className="z-50">
+              <p className="text-white text-center text-lg font-bold">
+                {currentPlay.formation}
+              </p>
+              <img
+                src={currentPlay.formationDiagram}
+                alt="Formation Diagram"
+                width="100%"
+                height="auto"
+                style={{ objectFit: "contain" }}
+              />
+            </div>
+          )}
+
+          <div
+            ref={scrollContainerRef}
+            className={`flex flex-1 w-full overflow-x-auto hide-scrollbar snap-x snap-mandatory ${
+              isDragging ? "select-none" : ""
+            }`}
+          >
+            {flattenedPlays.map((play, index) => (
+              <div
+                key={play.id}
+                className="h-full w-full flex-shrink-0 snap-start"
+                onPointerDown={(e) => {
+                  setDragStartX(e.clientX);
+                  setDragMoved(false);
+                  setIsDragging(true);
+                }}
+                onPointerMove={(e) => {
+                  if (dragStartX !== null && !dragMoved) {
+                    const deltaX = e.clientX - dragStartX;
+                    if (Math.abs(deltaX) > 50) {
+                      if (deltaX > 0) handleSwipe("right");
+                      else handleSwipe("left");
+                      setDragMoved(true);
+                    }
                   }
-                }
-              }}
-              onPointerUp={() => {
-                setDragStartY(null);
-                setDragMoved(false);
-                setIsDragging(false);
-              }}
-            >
-              <div className="w-full h-full flex justify-center items-center relative">
-                {index === currentIndex && (
-                  <ReactPlayer
-                    url={play.video_url}
-                    playing={isPlaying}
-                    loop
-                    muted
-                    controls={false}
-                    width="100%"
-                    height="100%"
-                    style={{ maxHeight: "100%", maxWidth: "100%" }}
-                    onClick={() => setIsPlaying((prev) => !prev)}
+                }}
+                onPointerUp={() => {
+                  setDragStartX(null);
+                  setDragMoved(false);
+                  setIsDragging(false);
+                }}
+              >
+                <div className="w-full h-full flex justify-center items-center relative">
+                  {index === currentIndex && (
+                    <ReactPlayer
+                      url={play.video_url}
+                      playing={isPlaying}
+                      controls={false}
+                      muted={false}
+                      loop
+                      width="100%"
+                      style={{ maxWidth: "100%", maxHeight: "100%" }}
+                      onClick={() => setIsPlaying((prev) => !prev)}
+                    />
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      ) : (
+        <div className="py-4 w-full">
+          <div
+            className="bg-black w-full rounded-lg overflow-hidden mb-6 relative border-4 border-white border-opacity-80 shadow-2xl"
+            style={{
+              boxShadow:
+                "inset 0 0 20px rgba(255,255,255,0.1), 0 8px 32px rgba(0,0,0,0.6)",
+            }}
+          >
+            {/* Chalk frame corners */}
+            <div className="absolute top-1 left-1 w-4 h-4 border-l-2 border-t-2 border-white opacity-60"></div>
+            <div className="absolute top-1 right-1 w-4 h-4 border-r-2 border-t-2 border-white opacity-60"></div>
+            <div className="absolute bottom-1 left-1 w-4 h-4 border-l-2 border-b-2 border-white opacity-60"></div>
+            <div className="absolute bottom-1 right-1 w-4 h-4 border-r-2 border-b-2 border-white opacity-60"></div>
+
+            <div className="aspect-video relative flex items-center justify-center">
+              <div className="text-white text-center">
+                <div className="w-20 h-20 bg-gradient-to-br from-green-500 to-green-700 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg animate-pulse">
+                  <Play
+                    size={32}
+                    className="text-white ml-1 drop-shadow-lg"
+                    fill="white"
                   />
-                )}
+                </div>
+                <p
+                  className="text-lg font-bold"
+                  style={{
+                    fontFamily: "Georgia, serif",
+                    textShadow: "2px 2px 4px rgba(0,0,0,0.8)",
+                    letterSpacing: "1px",
+                  }}
+                >
+                  PLAY ON LOOP
+                </p>
               </div>
             </div>
-          ))}
+          </div>
+        </div>
+      )}
+
+      <div className="flex justify-center items-center gap-4 p-2 pb-24 mb-2 w-full">
+        <div
+          className="cursor-pointer w-1/2 bg-white rounded-lg p-6 flex items-center justify-center min-h-[80px] relative transform hover:scale-105 transition-all duration-300 shadow-xl border-2 border-gray-200"
+          onClick={(e) => handleDropdownClick("formation", e)}
+        >
+          <p className="text-black text-sm font-bold">
+            {selectedFormation ? selectedFormation : "Formation"}
+          </p>
+        </div>
+        <div
+          className="cursor-pointer w-1/2 bg-white rounded-lg p-6 flex items-center justify-center min-h-[80px] relative transform hover:scale-105 transition-all duration-300 shadow-xl border-2 border-gray-200"
+          onClick={(e) => handleDropdownClick("playType", e)}
+        >
+          <p className="text-black text-sm font-bold">
+            {selectedPlayType ? selectedPlayType : "Play Type"}
+          </p>
         </div>
       </div>
+
+      {dropdownType && dropdownPosition && (
+        <>
+          <div
+            className="fixed z-50 h-36 w-44 overflow-y-auto bg-white rounded shadow-lg border border-gray-300"
+            style={{
+              top: dropdownPosition.y,
+              left: dropdownPosition.x,
+            }}
+            onClick={() => setDropdownType(null)}
+          >
+            {[
+              {
+                label:
+                  dropdownType === "formation"
+                    ? "Select Formation"
+                    : "Select Play Type",
+                value: "",
+              },
+              ...(dropdownType === "formation" ? formations : playTypes),
+            ].map((item, idx) => (
+              <div
+                key={idx}
+                className="px-4 py-2 hover:bg-gray-100 cursor-pointer text-sm"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  const value = item.value;
+                  setDropdownType(null);
+
+                  if (!value) {
+                    if (dropdownType === "formation") {
+                      setSelectedFormation("");
+
+                      setSelectedPlayType("");
+
+                      fetchPlays("", "");
+                    } else if (dropdownType === "playType") {
+                      setSelectedPlayType("");
+
+                      fetchPlays(selectedFormation, "");
+                    }
+                    return;
+                  }
+
+                  if (dropdownType === "formation") {
+                    setSelectedFormation(value);
+                    fetchPlays(value, selectedPlayType || "");
+                  } else if (dropdownType === "playType") {
+                    setSelectedPlayType(value);
+                    if (selectedFormation) {
+                      fetchPlays(selectedFormation, value);
+                    }
+                  }
+                }}
+              >
+                {item.label}
+              </div>
+            ))}
+          </div>
+        </>
+      )}
     </div>
   );
 };
