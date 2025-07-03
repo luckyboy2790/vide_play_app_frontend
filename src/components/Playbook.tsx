@@ -8,6 +8,8 @@ import { playTypes, formations } from "@/constants/playOptions";
 
 const API_URL = import.meta.env.VITE_BACKEND_URL;
 
+const IMG_URL = import.meta.env.VITE_IMAGE_URL;
+
 const Playbook = () => {
   const [loading, setLoading] = useState(false);
   const [cookies] = useCookies(["authToken"]);
@@ -29,6 +31,8 @@ const Playbook = () => {
 
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const scrollTargetIndexRef = useRef<number | null>(null);
+
+  const [playOfDay, setPlayOfDay] = useState<any | null>(null);
 
   const [selectedFormation, setSelectedFormation] = useState<string | null>(
     null
@@ -176,6 +180,22 @@ const Playbook = () => {
     }
   };
 
+  useEffect(() => {
+    const fetchPlayOfDay = async () => {
+      const response = await fetch(`${API_URL}/api/plays/video_of_day`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      const result = await response.json();
+
+      console.log(result);
+
+      setPlayOfDay(result.play);
+    };
+
+    fetchPlayOfDay();
+  }, []);
+
   if (loading) {
     return (
       <div className="h-full flex items-center justify-center text-white">
@@ -202,16 +222,12 @@ const Playbook = () => {
           style={{ transform: "translateX(-50%) rotate(1deg)" }}
         ></div>
       </h2>
-
-      {flattenedPlays.length > 0 ? (
+      {selectedFormation !== null && selectedFormation !== "" ? (
         <div className="relative overflow-hidden w-full h-full flex flex-col justify-between items-center">
-          {currentPlay?.formationDiagram && (
+          {selectedFormation && (
             <div className="z-50">
-              <p className="text-white text-center text-lg font-bold">
-                {currentPlay.formation}
-              </p>
               <img
-                src={currentPlay.formationDiagram}
+                src={`${IMG_URL}/formation-diagrams/${selectedFormation}.png`}
                 alt="Formation Diagram"
                 width="100%"
                 height="auto"
@@ -226,47 +242,62 @@ const Playbook = () => {
               isDragging ? "select-none" : ""
             }`}
           >
-            {flattenedPlays.map((play, index) => (
-              <div
-                key={play.id}
-                className="h-full w-full flex-shrink-0 snap-start"
-                onPointerDown={(e) => {
-                  setDragStartX(e.clientX);
-                  setDragMoved(false);
-                  setIsDragging(true);
-                }}
-                onPointerMove={(e) => {
-                  if (dragStartX !== null && !dragMoved) {
-                    const deltaX = e.clientX - dragStartX;
-                    if (Math.abs(deltaX) > 50) {
-                      if (deltaX > 0) handleSwipe("right");
-                      else handleSwipe("left");
-                      setDragMoved(true);
+            {flattenedPlays.length > 0 ? (
+              flattenedPlays.map((play, index) => (
+                <div
+                  key={play.id}
+                  className="h-full w-full flex-shrink-0 snap-start"
+                  onPointerDown={(e) => {
+                    setDragStartX(e.clientX);
+                    setDragMoved(false);
+                    setIsDragging(true);
+                  }}
+                  onPointerMove={(e) => {
+                    if (dragStartX !== null && !dragMoved) {
+                      const deltaX = e.clientX - dragStartX;
+                      if (Math.abs(deltaX) > 50) {
+                        if (deltaX > 0) handleSwipe("right");
+                        else handleSwipe("left");
+                        setDragMoved(true);
+                      }
                     }
-                  }
-                }}
-                onPointerUp={() => {
-                  setDragStartX(null);
-                  setDragMoved(false);
-                  setIsDragging(false);
-                }}
-              >
-                <div className="w-full h-full flex justify-center items-center relative">
-                  {index === currentIndex && (
-                    <ReactPlayer
-                      url={play.video_url}
-                      playing={isPlaying}
-                      controls={false}
-                      muted={false}
-                      loop
-                      width="100%"
-                      style={{ maxWidth: "100%", maxHeight: "100%" }}
-                      onClick={() => setIsPlaying((prev) => !prev)}
-                    />
-                  )}
+                  }}
+                  onPointerUp={() => {
+                    setDragStartX(null);
+                    setDragMoved(false);
+                    setIsDragging(false);
+                  }}
+                >
+                  <div className="w-full h-full flex justify-center items-center relative">
+                    {index === currentIndex && (
+                      <ReactPlayer
+                        url={play.video_url}
+                        playing={isPlaying}
+                        controls={false}
+                        muted={false}
+                        loop
+                        width="100%"
+                        style={{ maxWidth: "100%", maxHeight: "100%" }}
+                        onClick={() => setIsPlaying((prev) => !prev)}
+                      />
+                    )}
+                  </div>
                 </div>
+              ))
+            ) : (
+              <div className="flex flex-1 w-full justify-center items-center">
+                <h2
+                  className="text-xl font-normal text-white mb-4 relative pt-20"
+                  style={{
+                    fontFamily: "Georgia, serif",
+                    textShadow: "3px 3px 6px rgba(0,0,0,0.8)",
+                    transform: "rotate(-1deg)",
+                  }}
+                >
+                  There is no matched video.
+                </h2>
               </div>
-            ))}
+            )}
           </div>
         </div>
       ) : (
@@ -278,37 +309,33 @@ const Playbook = () => {
                 "inset 0 0 20px rgba(255,255,255,0.1), 0 8px 32px rgba(0,0,0,0.6)",
             }}
           >
-            {/* Chalk frame corners */}
-            <div className="absolute top-1 left-1 w-4 h-4 border-l-2 border-t-2 border-white opacity-60"></div>
-            <div className="absolute top-1 right-1 w-4 h-4 border-r-2 border-t-2 border-white opacity-60"></div>
-            <div className="absolute bottom-1 left-1 w-4 h-4 border-l-2 border-b-2 border-white opacity-60"></div>
-            <div className="absolute bottom-1 right-1 w-4 h-4 border-r-2 border-b-2 border-white opacity-60"></div>
-
-            <div className="aspect-video relative flex items-center justify-center">
-              <div className="text-white text-center">
-                <div className="w-20 h-20 bg-gradient-to-br from-green-500 to-green-700 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg animate-pulse">
-                  <Play
-                    size={32}
-                    className="text-white ml-1 drop-shadow-lg"
-                    fill="white"
-                  />
-                </div>
-                <p
-                  className="text-lg font-bold"
-                  style={{
-                    fontFamily: "Georgia, serif",
-                    textShadow: "2px 2px 4px rgba(0,0,0,0.8)",
-                    letterSpacing: "1px",
-                  }}
-                >
-                  PLAY ON LOOP
-                </p>
-              </div>
-            </div>
+            <ReactPlayer
+              url={playOfDay?.video_url}
+              playing={false}
+              controls={false}
+              muted={false}
+              loop
+              width="100%"
+              style={{ maxWidth: "100%", maxHeight: "100%" }}
+            />
           </div>
         </div>
       )}
 
+      <h2
+        className="text-2xl font-bold text-white mb-4 relative"
+        style={{
+          fontFamily: "Georgia, serif",
+          textShadow: "3px 3px 6px rgba(0,0,0,0.8)",
+          transform: "rotate(-1deg)",
+        }}
+      >
+        View All Saved Plays
+        <div
+          className="absolute -bottom-2 left-1/2 transform -translate-x-1/2 w-48 h-1 bg-white opacity-70 rounded-full"
+          style={{ transform: "translateX(-50%) rotate(1deg)" }}
+        ></div>
+      </h2>
       <div className="flex justify-center items-center gap-4 p-2 pb-24 mb-2 w-full">
         <div
           className="cursor-pointer w-1/2 bg-white rounded-lg p-6 flex items-center justify-center min-h-[80px] relative transform hover:scale-105 transition-all duration-300 shadow-xl border-2 border-gray-200"
