@@ -1,9 +1,9 @@
-
-import { useState, useEffect } from 'react';
-import { User, Settings } from 'lucide-react';
-import { supabase } from '@/integrations/supabase/client';
-import { useAuth } from '@/contexts/AuthContext';
-import { useToast } from '@/hooks/use-toast';
+import { useState, useEffect } from "react";
+import { User } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
+import { useCookies } from "react-cookie";
+import { RiLogoutBoxRLine } from "react-icons/ri";
+import { useAuth } from "@/contexts/AuthContext";
 
 interface PlayData {
   id: string;
@@ -16,69 +16,55 @@ interface PlayData {
   tags: string[];
 }
 
+const API_URL = import.meta.env.VITE_BACKEND_URL;
+
 const ProfilePage = () => {
   const [userPlays, setUserPlays] = useState<PlayData[]>([]);
   const [loading, setLoading] = useState(true);
-  const [favoriteFormation, setFavoriteFormation] = useState<string>('');
-  const [favoritePlayType, setFavoritePlayType] = useState<string>('');
-  const { user } = useAuth();
+  const [favoriteFormation, setFavoriteFormation] = useState<string>("");
+  const [favoritePlayType, setFavoritePlayType] = useState<string>("");
+  const [userData, setUserData] = useState<any>({});
   const { toast } = useToast();
+
+  const [cookies] = useCookies(["authToken"]);
+
+  const { signOut } = useAuth();
 
   useEffect(() => {
     const fetchUserData = async () => {
-      if (!user) return;
-
       try {
-        const { data, error } = await supabase
-          .from('plays')
-          .select('*')
-          .eq('user_id', user.id)
-          .order('created_at', { ascending: false });
-
-        if (error) {
-          console.error('Error fetching user plays:', error);
-          toast({
-            title: "Error loading plays",
-            description: "Could not load your plays.",
-            variant: "destructive",
-          });
-          return;
-        }
-
-        const transformedPlays: PlayData[] = (data || []).map(play => ({
-          id: play.id.toString(),
-          caption: play.caption || '',
-          play_type: play.play_type || '',
-          formation: play.formation || '',
-          video_url: play.video_url || '',
-          shared_by: play.shared_by || 'You',
-          created_at: play.created_at,
-          tags: Array.isArray(play.tags) ? play.tags : []
-        }));
-
-        setUserPlays(transformedPlays);
-
-        // Calculate favorite formation and play type
-        const formationCounts: { [key: string]: number } = {};
-        const playTypeCounts: { [key: string]: number } = {};
-
-        transformedPlays.forEach(play => {
-          if (play.formation) {
-            formationCounts[play.formation] = (formationCounts[play.formation] || 0) + 1;
-          }
-          if (play.play_type) {
-            playTypeCounts[play.play_type] = (playTypeCounts[play.play_type] || 0) + 1;
-          }
+        const userReponse = await fetch(`${API_URL}/api/users/profile`, {
+          headers: {
+            Authorization: `Bearer ${cookies.authToken}`,
+          },
         });
 
-        const topFormation = Object.entries(formationCounts).sort((a, b) => b[1] - a[1])[0];
-        const topPlayType = Object.entries(playTypeCounts).sort((a, b) => b[1] - a[1])[0];
+        const userResult = await userReponse.json();
 
-        setFavoriteFormation(topFormation ? topFormation[0] : 'Wing');
-        setFavoritePlayType(topPlayType ? topPlayType[0] : 'Inside Run');
+        setUserData(userResult?.user[0]);
 
+        const playResponse = await fetch(`${API_URL}/api/plays`, {
+          headers: {
+            Authorization: `Bearer ${cookies.authToken}`,
+          },
+        });
+
+        const playResult = await playResponse.json();
+
+        setUserPlays(playResult.plays);
+
+        const fypResponse = await fetch(`${API_URL}/api/plays/fyp`, {
+          headers: {
+            Authorization: `Bearer ${cookies.authToken}`,
+          },
+        });
+
+        const fypResult = await fypResponse.json();
+
+        setFavoriteFormation(fypResult?.most_used?.formation);
+        setFavoritePlayType(fypResult?.most_used?.play_type);
       } catch (error) {
-        console.error('Error fetching user data:', error);
+        console.error("Error fetching user data:", error);
         toast({
           title: "Error loading profile",
           description: "Could not load your profile data.",
@@ -90,7 +76,7 @@ const ProfilePage = () => {
     };
 
     fetchUserData();
-  }, [user, toast]);
+  }, [toast, cookies]);
 
   if (loading) {
     return (
@@ -104,40 +90,54 @@ const ProfilePage = () => {
   }
 
   return (
-    <div className="h-full flex flex-col p-4 overflow-hidden">
-      {/* Profile Header with Settings */}
-      <div className="bg-white rounded-lg shadow-md p-4 border border-gray-200 relative flex-shrink-0 mb-4">
-        <button className="absolute top-3 right-3 p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition-colors">
-          <Settings size={18} />
-        </button>
+    <div className="h-full flex flex-col p-4 overflow-hidden pt-20">
+      <div className="bg-white rounded-lg shadow-md p-4 border border-gray-200 relative flex-shrink-0 mb-4 flex justify-between items-center">
         <div className="flex items-center space-x-3">
           <div className="w-12 h-12 bg-green-600 rounded-full flex items-center justify-center">
             <User size={24} className="text-white" />
           </div>
           <div>
-            <h2 className="text-lg font-bold text-gray-900">Coach Will</h2>
+            <h2 className="text-lg font-bold text-gray-900">
+              {userData?.username}
+            </h2>
           </div>
         </div>
+        <button
+          className="p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
+          onClick={signOut}
+        >
+          <RiLogoutBoxRLine size={24} />
+        </button>
       </div>
 
-      {/* Playbook Section */}
       <div className="bg-white rounded-lg shadow-md p-4 border border-gray-200 flex-shrink-0 mb-4">
-        <h3 className="text-base font-semibold text-gray-900">Playbook - {userPlays.length} plays</h3>
+        <h3 className="text-base font-semibold text-gray-900">
+          Playbook - {userPlays.length} plays
+        </h3>
       </div>
 
-      {/* Favorite Formation & Play Type Grid - Much smaller blocks */}
       <div className="grid grid-cols-2 gap-3 flex-1">
         <div className="bg-white rounded-lg p-3 flex items-center justify-center h-16 border-2 border-white hover:bg-green-100 transition-colors">
           <div className="text-center">
             <p className="text-xs text-gray-500 mb-1">Favorite Formation</p>
-            <span className="text-sm font-bold text-green-800" style={{ fontFamily: 'Georgia, serif' }}>{favoriteFormation}</span>
+            <span
+              className="text-sm font-bold text-green-800"
+              style={{ fontFamily: "Georgia, serif" }}
+            >
+              {favoriteFormation}
+            </span>
           </div>
         </div>
 
         <div className="bg-white rounded-lg p-3 flex items-center justify-center h-16 border-2 border-white hover:bg-green-100 transition-colors">
           <div className="text-center">
             <p className="text-xs text-gray-500 mb-1">Favorite Play Type</p>
-            <span className="text-sm font-bold text-green-800" style={{ fontFamily: 'Georgia, serif' }}>{favoritePlayType}</span>
+            <span
+              className="text-sm font-bold text-green-800"
+              style={{ fontFamily: "Georgia, serif" }}
+            >
+              {favoritePlayType}
+            </span>
           </div>
         </div>
       </div>

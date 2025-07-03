@@ -1,9 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { useCookies } from "react-cookie";
 import { useToast } from "@/hooks/use-toast";
-import { Image } from "antd";
 import ReactPlayer from "react-player";
-import { Play } from "lucide-react";
 import { playTypes, formations } from "@/constants/playOptions";
 
 const API_URL = import.meta.env.VITE_BACKEND_URL;
