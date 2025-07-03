@@ -204,8 +204,6 @@ const Playbook = () => {
     );
   }
 
-  const currentPlay = flattenedPlays[currentIndex];
-
   return (
     <div className="h-screen max-w-sm w-full mx-auto flex flex-col justify-start items-center overflow-hidden relative">
       <h2

@@ -301,14 +301,14 @@ const HomeFeed = () => {
 
           <div className="mb-2">
             <div className="flex flex-wrap gap-2 mb-2">
-              {currentPlay.play_type && (
-                <div className="mt-2 px-3 py-1 bg-green-600 rounded-full text-xs font-medium inline-block">
-                  {currentPlay.play_type.toUpperCase()}
+              {currentPlay?.play_type && (
+                <div className="mt-2 h-7 flex justify-center items-center px-3 py-1 bg-green-600 rounded-full text-xs font-medium">
+                  {currentPlay?.play_type.toUpperCase()}
                 </div>
               )}
-              {currentPlay.formation && (
-                <div className="flex justify-center items-center mt-1 px-3 py-1 bg-blue-600 rounded-full text-xs font-medium ml-2">
-                  {currentPlay.formation.toUpperCase()}
+              {currentPlay?.formation && (
+                <div className="mt-2 h-7 flex justify-center items-center px-3 py-1 bg-blue-600 rounded-full text-xs font-medium ml-2">
+                  {currentPlay?.formation.toUpperCase()}
                 </div>
               )}
             </div>
