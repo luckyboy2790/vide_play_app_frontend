@@ -5,6 +5,7 @@ import HomeFeed from "@/components/HomeFeed";
 import Playbook from "@/components/Playbook";
 import SearchPage from "@/components/SearchPage";
 import ProfilePage from "@/components/ProfilePage";
+import EditProfilePage from "@/components/EditProfilePage";
 
 const Index = () => {
   const [activeTab, setActiveTab] = useState("home");
@@ -18,8 +19,10 @@ const Index = () => {
         return <Playbook />;
       case "search":
         return <SearchPage />;
-      case "profile":
-        return <ProfilePage />;
+      case "setting":
+        return <ProfilePage setActiveTab={setActiveTab} />;
+      case "editProfile":
+        return <EditProfilePage />;
       default:
         return <HomeFeed />;
     }
@@ -43,7 +46,8 @@ const Index = () => {
             >
               {activeTab === "playbook" && "📋 PLAYBOOK"}
               {activeTab === "search" && "🔍 SEARCH PLAYS"}
-              {activeTab === "profile" && "👤 COACH PROFILE"}
+              {activeTab === "setting" && "⚙️ SETTINGS"}
+              {activeTab === "editProfile" && "👤 EDIT PROFILE"}
             </h1>
           </div>
           {/* Chalk underline */}
@@ -116,16 +120,16 @@ const Index = () => {
           </button>
 
           <button
-            onClick={() => setActiveTab("profile")}
+            onClick={() => setActiveTab("setting")}
             className={`flex flex-col items-center p-2 transition-all duration-200 ${
-              activeTab === "profile"
+              activeTab === "setting"
                 ? "text-white transform scale-110"
                 : "text-green-300 hover:text-white hover:scale-105"
             }`}
           >
             <User size={24} className="drop-shadow-lg" />
-            <span className="text-xs mt-1 font-semibold">Profile</span>
-            {activeTab === "profile" && (
+            <span className="text-xs mt-1 font-semibold">Setting</span>
+            {activeTab === "setting" && (
               <div className="w-6 h-0.5 bg-white mt-1 rounded"></div>
             )}
           </button>

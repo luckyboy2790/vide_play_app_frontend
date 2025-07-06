@@ -15,6 +15,7 @@ interface AuthContextType {
   user: any;
   loading: boolean;
   errorMessage: string | null;
+  updateUser: (user: any[]) => void;
   signUp: (email: string, password: string, username: string) => Promise<void>;
   signIn: (email: string, password: string) => Promise<void>;
   signOut: () => void;
@@ -30,6 +31,8 @@ const reducer = (state: any, action: any) => {
   switch (action.type) {
     case "INIT":
       return { ...state, user: action.payload.user, loading: false };
+    case "UPDATE_PROFILE":
+      return { ...state, user: [action.payload.user] };
     case "LOGIN_SUCCESS":
       return { ...state, user: action.payload.user, loading: false };
     case "LOGOUT":
@@ -197,10 +200,15 @@ const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     getProfile();
   }, []);
 
+  const updateUser = (user: any) => {
+    dispatch({ type: "UPDATE_PROFILE", payload: { user } });
+  };
+
   const value: AuthContextType = {
     user: state.user,
     loading: state.loading,
     errorMessage: state.errorMessage,
+    updateUser,
     signUp,
     signIn,
     signOut,
