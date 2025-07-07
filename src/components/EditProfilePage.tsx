@@ -13,6 +13,8 @@ const EditProfilePage = () => {
   const { toast } = useToast();
   const [cookies] = useCookies(["authToken"]);
 
+  console.log(user)
+
   const [username, setUsername] = useState(user[0]?.username || "");
   const [email, setEmail] = useState(user[0]?.email || "");
   const [loading, setLoading] = useState(false);
