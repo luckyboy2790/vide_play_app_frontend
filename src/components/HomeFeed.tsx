@@ -291,7 +291,7 @@ const HomeFeed = () => {
           </div>
         </div>
 
-        <div className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black/80 to-transparent">
+        <div className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black/80 to-transparent z-50">
           <div
             className="absolute w-10 h-10 right-1 z-50 top-5"
             onClick={handleSave}

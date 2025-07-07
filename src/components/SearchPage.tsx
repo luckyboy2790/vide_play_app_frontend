@@ -297,7 +297,7 @@ const SearchPage = () => {
         </div>
 
         {currentPlay && (
-          <div className="absolute bottom-20 left-0 right-0 p-4 bg-gradient-to-t from-black/80 to-transparent">
+          <div className="absolute bottom-20 left-0 right-0 p-4 bg-gradient-to-t from-black/80 to-transparent z-50">
             <div className="mb-2">
               <div className="flex flex-wrap gap-2 mb-2">
                 {currentPlay?.play_type && (
