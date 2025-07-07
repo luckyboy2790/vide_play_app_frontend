@@ -9,11 +9,10 @@ import { useCookies } from "react-cookie";
 const API_URL = import.meta.env.VITE_BACKEND_URL;
 
 const EditProfilePage = () => {
-  const { user, updateUser } = useAuth();
+  const { updateUser } = useAuth();
+  const { user } = useAuth();
   const { toast } = useToast();
   const [cookies] = useCookies(["authToken"]);
-
-  console.log(user)
 
   const [username, setUsername] = useState(user[0]?.username || "");
   const [email, setEmail] = useState(user[0]?.email || "");
