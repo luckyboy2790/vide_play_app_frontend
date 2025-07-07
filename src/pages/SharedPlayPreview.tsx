@@ -31,11 +31,31 @@ const SharedPlayPreview = () => {
 
   const token = cookies.authToken;
 
+  const isYouTubeUrl = (url: string) =>
+    url.includes("youtube.com") || url.includes("youtu.be");
+
+  const downloadYouTubeFromRapidAPI = async (
+    url: string
+  ): Promise<string | null> => {
+    const videoId = url.match(/(?:v=|youtu\.be\/)([\w-]{11})/)?.[1];
+    if (!videoId) return null;
+
+    const apiUrl = `https://ytstream-download-youtube-videos.p.rapidapi.com/dl?id=${videoId}`;
+    const res = await fetch(apiUrl, {
+      method: "GET",
+      headers: {
+        "X-RapidAPI-Key": import.meta.env.VITE_RAPID_API_KEY,
+        "X-RapidAPI-Host": "ytstream-download-youtube-videos.p.rapidapi.com",
+      },
+    });
+    const data = await res.json();
+    return data?.formats?.[0]?.url || null;
+  };
+
   const handleSavePlay = async () => {
     if (!playType || !formation) {
       toast({
         title: "Please select both play type and formation",
-        description: "Both play type and formation are required before saving.",
         variant: "destructive",
       });
       return;
@@ -44,6 +64,15 @@ const SharedPlayPreview = () => {
     setIsLoading(true);
 
     try {
+      let finalVideoUrl = video_url;
+
+      if (isYouTubeUrl(video_url)) {
+        const youtubeDownloadUrl = await downloadYouTubeFromRapidAPI(video_url);
+        if (!youtubeDownloadUrl)
+          throw new Error("YouTube video not downloadable");
+        finalVideoUrl = youtubeDownloadUrl;
+      }
+
       const response = await fetch(`${API_URL}/api/plays`, {
         method: "POST",
         headers: {
@@ -51,36 +80,28 @@ const SharedPlayPreview = () => {
           Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({
-          url: video_url,
-          formation: formation,
+          url: finalVideoUrl,
+          formation,
           type: playType,
-          caption: caption,
+          caption,
         }),
       });
 
       if (!response.ok) {
         const result = await response.json();
-        console.error("Error saving play:", result);
-        toast({
-          title: "Error saving play",
-          description: "There was an error saving your play. Please try again.",
-          variant: "destructive",
-        });
-        setIsLoading(false);
-        return;
+        throw new Error(result.message);
       }
 
       toast({
         title: "Play saved!",
         description: "Your play has been successfully saved.",
       });
-
       navigate("/");
     } catch (error) {
-      console.error("Unexpected error:", error);
+      console.error("Error saving play:", error);
       toast({
         title: "Error saving play",
-        description: "There was an unexpected error. Please try again.",
+        description: error.message || "Unexpected error occurred.",
         variant: "destructive",
       });
     } finally {
