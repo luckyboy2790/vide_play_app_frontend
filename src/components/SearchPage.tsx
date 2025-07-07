@@ -346,7 +346,7 @@ const SearchPage = () => {
       {dropdownType && dropdownPosition && (
         <>
           <div
-            className="fixed z-50 h-36 w-44 overflow-y-auto bg-white rounded shadow-lg border border-gray-300"
+            className="fixed z-50 w-44 overflow-y-auto bg-white rounded shadow-lg border border-gray-300"
             style={{
               top: dropdownPosition.y,
               left: dropdownPosition.x,

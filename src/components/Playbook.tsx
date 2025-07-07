@@ -115,9 +115,8 @@ const Playbook = () => {
   ) => {
     e.stopPropagation();
 
-    const dropdownHeight = 144;
+    const dropdownHeight = type === "formation" ? 396 : 360;
     const footerHeight = 90;
-    const padding = 8;
     const viewportHeight = window.innerHeight;
 
     let top = e.pageY;
@@ -126,6 +125,8 @@ const Playbook = () => {
     }
 
     const left = type === "formation" ? e.pageX : e.pageX - 176;
+
+    console.log(left, top);
 
     setDropdownPosition({ x: left, y: top });
     setDropdownType(type);
@@ -203,21 +204,7 @@ const Playbook = () => {
   }
 
   return (
-    <div className="h-screen max-w-sm w-full mx-auto flex flex-col justify-start items-center overflow-hidden relative">
-      <h2
-        className="text-3xl font-bold text-white mb-4 relative pt-20"
-        style={{
-          fontFamily: "Georgia, serif",
-          textShadow: "3px 3px 6px rgba(0,0,0,0.8)",
-          transform: "rotate(-1deg)",
-        }}
-      >
-        PLAY OF THE DAY
-        <div
-          className="absolute -bottom-2 left-1/2 transform -translate-x-1/2 w-48 h-1 bg-white opacity-70 rounded-full"
-          style={{ transform: "translateX(-50%) rotate(1deg)" }}
-        ></div>
-      </h2>
+    <div className="h-screen max-w-sm w-full mx-auto flex flex-col justify-start items-center overflow-hidden relative pt-20">
       {selectedFormation !== null && selectedFormation !== "" ? (
         <div className="relative overflow-hidden w-full h-full flex flex-col justify-between items-center">
           {selectedFormation && (
@@ -297,25 +284,41 @@ const Playbook = () => {
           </div>
         </div>
       ) : (
-        <div className="py-4 w-full">
-          <div
-            className="bg-black w-full rounded-lg overflow-hidden mb-6 relative border-4 border-white border-opacity-80 shadow-2xl"
+        <>
+          <h2
+            className="text-3xl font-bold text-white mb-4 relative"
             style={{
-              boxShadow:
-                "inset 0 0 20px rgba(255,255,255,0.1), 0 8px 32px rgba(0,0,0,0.6)",
+              fontFamily: "Georgia, serif",
+              textShadow: "3px 3px 6px rgba(0,0,0,0.8)",
+              transform: "rotate(-1deg)",
             }}
           >
-            <ReactPlayer
-              url={playOfDay?.video_url}
-              playing={false}
-              controls={false}
-              muted={false}
-              loop
-              width="100%"
-              style={{ maxWidth: "100%", maxHeight: "100%" }}
-            />
+            PLAY OF THE DAY
+            <div
+              className="absolute -bottom-2 left-1/2 transform -translate-x-1/2 w-48 h-1 bg-white opacity-70 rounded-full"
+              style={{ transform: "translateX(-50%) rotate(1deg)" }}
+            ></div>
+          </h2>
+          <div className="py-4 w-full">
+            <div
+              className="bg-black w-full rounded-lg overflow-hidden mb-6 relative border-4 border-white border-opacity-80 shadow-2xl"
+              style={{
+                boxShadow:
+                  "inset 0 0 20px rgba(255,255,255,0.1), 0 8px 32px rgba(0,0,0,0.6)",
+              }}
+            >
+              <ReactPlayer
+                url={playOfDay?.video_url}
+                playing={false}
+                controls={false}
+                muted={false}
+                loop
+                width="100%"
+                style={{ maxWidth: "100%", maxHeight: "100%" }}
+              />
+            </div>
           </div>
-        </div>
+        </>
       )}
 
       <h2
@@ -354,7 +357,7 @@ const Playbook = () => {
       {dropdownType && dropdownPosition && (
         <>
           <div
-            className="fixed z-50 h-36 w-44 overflow-y-auto bg-white rounded shadow-lg border border-gray-300"
+            className="fixed z-50 w-44 overflow-y-auto bg-white rounded shadow-lg border border-gray-300"
             style={{
               top: dropdownPosition.y,
               left: dropdownPosition.x,

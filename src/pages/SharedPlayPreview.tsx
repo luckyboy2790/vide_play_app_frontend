@@ -3,10 +3,8 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import { Save } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
-import { supabase } from "@/integrations/supabase/client";
 import SharedPlayHeader from "@/components/SharedPlayHeader";
 import VideoPreview from "@/components/VideoPreview";
-import CaptionDisplay from "@/components/CaptionDisplay";
 import PlayForm from "@/components/PlayForm";
 import { useCookies } from "react-cookie";
 
@@ -126,8 +124,6 @@ const SharedPlayPreview = () => {
         />
 
         <VideoPreview videoUrl={video_url} />
-
-        <CaptionDisplay caption={caption} />
 
         {/* Save Button */}
         <Button
