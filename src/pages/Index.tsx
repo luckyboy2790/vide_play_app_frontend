@@ -19,7 +19,7 @@ const Index = () => {
         return <Playbook />;
       case "search":
         return <SearchPage />;
-      case "setting":
+      case "profile":
         return <ProfilePage setActiveTab={setActiveTab} />;
       case "editProfile":
         return <EditProfilePage />;
@@ -46,7 +46,7 @@ const Index = () => {
             >
               {activeTab === "playbook" && "📋 PLAYBOOK"}
               {activeTab === "search" && "🔍 SEARCH PLAYS"}
-              {activeTab === "setting" && "⚙️ SETTINGS"}
+              {activeTab === "profile" && "⚙️ SETTINGS"}
               {activeTab === "editProfile" && "👤 EDIT PROFILE"}
             </h1>
           </div>
@@ -120,16 +120,16 @@ const Index = () => {
           </button>
 
           <button
-            onClick={() => setActiveTab("setting")}
+            onClick={() => setActiveTab("profile")}
             className={`flex flex-col items-center p-2 transition-all duration-200 ${
-              activeTab === "setting"
+              activeTab === "profile"
                 ? "text-white transform scale-110"
                 : "text-green-300 hover:text-white hover:scale-105"
             }`}
           >
             <User size={24} className="drop-shadow-lg" />
-            <span className="text-xs mt-1 font-semibold">Setting</span>
-            {activeTab === "setting" && (
+            <span className="text-xs mt-1 font-semibold">Profile</span>
+            {activeTab === "profile" && (
               <div className="w-6 h-0.5 bg-white mt-1 rounded"></div>
             )}
           </button>
