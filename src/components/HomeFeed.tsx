@@ -178,7 +178,7 @@ const HomeFeed = () => {
           <div className="flex justify-between items-center">
             <div className="flex-1 flex justify-center">
               <button className="text-white font-bold text-lg border-b-2 border-white pb-1">
-                Learn New Plays
+                Home Page
               </button>
             </div>
             <button
