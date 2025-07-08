@@ -8,6 +8,7 @@ import { Play } from "@/types/play";
 import { useCookies } from "react-cookie";
 import { useToast } from "@/hooks/use-toast";
 import ReactPlayer from "react-player";
+import FilterModal from "./FilterModal";
 
 const API_URL = import.meta.env.VITE_BACKEND_URL;
 
@@ -18,10 +19,7 @@ const SearchPage = () => {
   >(null);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const [plays, setPlays] = useState<Play[]>([]);
-  const [dropdownPosition, setDropdownPosition] = useState<{
-    x: number;
-    y: number;
-  } | null>(null);
+  const [modalOpen, setModalOpen] = useState(false);
   const [selectedFormation, setSelectedFormation] = useState<string | null>(
     null
   );
@@ -90,28 +88,6 @@ const SearchPage = () => {
     fetchPlays(selectedFormation, selectedPlayType);
   }, [selectedFormation, selectedPlayType]);
 
-  const handleDropdownClick = (
-    type: "formation" | "playType",
-    e: React.MouseEvent<HTMLDivElement>
-  ) => {
-    e.stopPropagation();
-
-    const dropdownHeight = 144;
-    const footerHeight = 90;
-    const padding = 8;
-    const viewportHeight = window.innerHeight;
-
-    let top = e.pageY;
-    if (top + dropdownHeight + footerHeight > viewportHeight) {
-      top = top - dropdownHeight;
-    }
-
-    const left = type === "formation" ? e.pageX : e.pageX - 176;
-
-    setDropdownPosition({ x: left, y: top });
-    setDropdownType(type);
-  };
-
   const handleSwipe = (direction: "up" | "down") => {
     setIsPlaying(false);
     if (direction === "up" && currentIndex < plays.length - 1) {
@@ -168,20 +144,6 @@ const SearchPage = () => {
 
   const currentPlay = plays[currentIndex];
 
-  useEffect(() => {
-    const handleOutsideClick = () => {
-      setDropdownType(null);
-    };
-
-    if (dropdownType) {
-      window.addEventListener("click", handleOutsideClick);
-    }
-
-    return () => {
-      window.removeEventListener("click", handleOutsideClick);
-    };
-  }, [dropdownType]);
-
   if (loading) {
     return (
       <div className="h-full flex items-center justify-center bg-black">
@@ -197,7 +159,7 @@ const SearchPage = () => {
       <div className="flex justify-center items-center gap-4 p-2 w-full absolute top-20 z-50">
         <div
           className="cursor-pointer w-1/2 bg-white rounded-lg p-6 flex items-center justify-center min-h-[80px] relative transform hover:scale-105 transition-all duration-300 shadow-xl border-2 border-gray-200"
-          onClick={(e) => handleDropdownClick("formation", e)}
+          onClick={() => setModalOpen(true)}
         >
           <p className="text-black text-sm font-bold">
             {selectedFormation ? selectedFormation : "Formation"}
@@ -205,7 +167,7 @@ const SearchPage = () => {
         </div>
         <div
           className="cursor-pointer w-1/2 bg-white rounded-lg p-6 flex items-center justify-center min-h-[80px] relative transform hover:scale-105 transition-all duration-300 shadow-xl border-2 border-gray-200"
-          onClick={(e) => handleDropdownClick("playType", e)}
+          onClick={() => setModalOpen(true)}
         >
           <p className="text-black text-sm font-bold">
             {selectedPlayType ? selectedPlayType : "Play Type"}
@@ -343,64 +305,20 @@ const SearchPage = () => {
         </div>
       </div>
 
-      {dropdownType && dropdownPosition && (
-        <>
-          <div
-            className="fixed z-50 w-44 overflow-y-auto bg-white rounded shadow-lg border border-gray-300"
-            style={{
-              top: dropdownPosition.y,
-              left: dropdownPosition.x,
-            }}
-            onClick={() => setDropdownType(null)}
-          >
-            {[
-              {
-                label:
-                  dropdownType === "formation"
-                    ? "Select Formation"
-                    : "Select Play Type",
-                value: "",
-              },
-              ...(dropdownType === "formation" ? formations : playTypes),
-            ].map((item, idx) => (
-              <div
-                key={idx}
-                className="px-4 py-2 hover:bg-gray-100 cursor-pointer text-sm"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  const value = item.value;
-                  setDropdownType(null);
-
-                  if (!value) {
-                    if (dropdownType === "formation") {
-                      setSelectedFormation("");
-
-                      fetchPlays("", "");
-                    } else if (dropdownType === "playType") {
-                      setSelectedPlayType("");
-
-                      fetchPlays(selectedFormation, "");
-                    }
-                    return;
-                  }
-
-                  if (dropdownType === "formation") {
-                    setSelectedFormation(value);
-                    fetchPlays(value, selectedPlayType || "");
-                  } else if (dropdownType === "playType") {
-                    setSelectedPlayType(value);
-                    if (selectedFormation) {
-                      fetchPlays(selectedFormation, value);
-                    }
-                  }
-                }}
-              >
-                {item.label}
-              </div>
-            ))}
-          </div>
-        </>
-      )}
+      <FilterModal
+        open={modalOpen}
+        onClose={() => setModalOpen(false)}
+        selectedFormation={selectedFormation}
+        selectedPlayType={selectedPlayType}
+        onSelectFormation={setSelectedFormation}
+        onSelectPlayType={setSelectedPlayType}
+        onApply={(tempFormation: string, tempPlayType: string) => {
+          setSelectedFormation(tempFormation);
+          setSelectedPlayType(tempPlayType);
+          fetchPlays(tempFormation, tempPlayType);
+          setModalOpen(false);
+        }}
+      />
     </div>
   );
 };

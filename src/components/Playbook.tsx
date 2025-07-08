@@ -3,6 +3,8 @@ import { useCookies } from "react-cookie";
 import { useToast } from "@/hooks/use-toast";
 import ReactPlayer from "react-player";
 import { playTypes, formations } from "@/constants/playOptions";
+import FilterModal from "@/components/FilterModal";
+import { open } from "fs";
 
 const API_URL = import.meta.env.VITE_BACKEND_URL;
 
@@ -19,13 +21,7 @@ const Playbook = () => {
   const [isDragging, setIsDragging] = useState(false);
   const [dragStartX, setDragStartX] = useState<number | null>(null);
   const [dragMoved, setDragMoved] = useState(false);
-  const [dropdownType, setDropdownType] = useState<
-    "formation" | "playType" | null
-  >(null);
-  const [dropdownPosition, setDropdownPosition] = useState<{
-    x: number;
-    y: number;
-  } | null>(null);
+  const [modalOpen, setModalOpen] = useState(false);
 
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const scrollTargetIndexRef = useRef<number | null>(null);
@@ -108,43 +104,6 @@ const Playbook = () => {
       behavior: "smooth",
     });
   }, [currentIndex]);
-
-  const handleDropdownClick = (
-    type: "formation" | "playType",
-    e: React.MouseEvent<HTMLDivElement>
-  ) => {
-    e.stopPropagation();
-
-    const dropdownHeight = type === "formation" ? 396 : 360;
-    const footerHeight = 90;
-    const viewportHeight = window.innerHeight;
-
-    let top = e.pageY;
-    if (top + dropdownHeight + footerHeight > viewportHeight) {
-      top = top - dropdownHeight;
-    }
-
-    const left = type === "formation" ? e.pageX : e.pageX - 176;
-
-    console.log(left, top);
-
-    setDropdownPosition({ x: left, y: top });
-    setDropdownType(type);
-  };
-
-  useEffect(() => {
-    const handleOutsideClick = () => {
-      setDropdownType(null);
-    };
-
-    if (dropdownType) {
-      window.addEventListener("click", handleOutsideClick);
-    }
-
-    return () => {
-      window.removeEventListener("click", handleOutsideClick);
-    };
-  }, [dropdownType]);
 
   const fetchPlays = async (formation: string, playType: string) => {
     setLoading(true);
@@ -339,7 +298,7 @@ const Playbook = () => {
       <div className="flex justify-center items-center gap-4 p-2 pb-24 mb-2 w-full">
         <div
           className="cursor-pointer w-1/2 bg-white rounded-lg p-6 flex items-center justify-center min-h-[80px] relative transform hover:scale-105 transition-all duration-300 shadow-xl border-2 border-gray-200"
-          onClick={(e) => handleDropdownClick("formation", e)}
+          onClick={() => setModalOpen(true)}
         >
           <p className="text-black text-sm font-bold">
             {selectedFormation ? selectedFormation : "Formation"}
@@ -347,7 +306,7 @@ const Playbook = () => {
         </div>
         <div
           className="cursor-pointer w-1/2 bg-white rounded-lg p-6 flex items-center justify-center min-h-[80px] relative transform hover:scale-105 transition-all duration-300 shadow-xl border-2 border-gray-200"
-          onClick={(e) => handleDropdownClick("playType", e)}
+          onClick={() => setModalOpen(true)}
         >
           <p className="text-black text-sm font-bold">
             {selectedPlayType ? selectedPlayType : "Play Type"}
@@ -355,62 +314,20 @@ const Playbook = () => {
         </div>
       </div>
 
-      {dropdownType && dropdownPosition && (
-        <>
-          <div
-            className="fixed z-50 w-44 overflow-y-auto bg-white rounded shadow-lg border border-gray-300"
-            style={{
-              top: dropdownPosition.y,
-              left: dropdownPosition.x,
-            }}
-            onClick={() => setDropdownType(null)}
-          >
-            {[
-              {
-                label:
-                  dropdownType === "formation"
-                    ? "Select Formation"
-                    : "Select Play Type",
-                value: "",
-              },
-              ...(dropdownType === "formation" ? formations : playTypes),
-            ].map((item, idx) => (
-              <div
-                key={idx}
-                className="px-4 py-2 hover:bg-gray-100 cursor-pointer text-sm"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  const value = item.value;
-                  setDropdownType(null);
-
-                  if (!value) {
-                    if (dropdownType === "formation") {
-                      setSelectedFormation("");
-
-                      fetchPlays("", selectedPlayType || "");
-                    } else if (dropdownType === "playType") {
-                      setSelectedPlayType("");
-
-                      fetchPlays(selectedFormation || "", "");
-                    }
-                    return;
-                  }
-
-                  if (dropdownType === "formation") {
-                    setSelectedFormation(value);
-                    fetchPlays(value, selectedPlayType || "");
-                  } else if (dropdownType === "playType") {
-                    setSelectedPlayType(value);
-                    fetchPlays(selectedFormation || "", value);
-                  }
-                }}
-              >
-                {item.label}
-              </div>
-            ))}
-          </div>
-        </>
-      )}
+      <FilterModal
+        open={modalOpen}
+        onClose={() => setModalOpen(false)}
+        selectedFormation={selectedFormation}
+        selectedPlayType={selectedPlayType}
+        onSelectFormation={setSelectedFormation}
+        onSelectPlayType={setSelectedPlayType}
+        onApply={(tempFormation: string, tempPlayType: string) => {
+          setSelectedFormation(tempFormation);
+          setSelectedPlayType(tempPlayType);
+          fetchPlays(tempFormation, tempPlayType);
+          setModalOpen(false);
+        }}
+      />
     </div>
   );
 };
