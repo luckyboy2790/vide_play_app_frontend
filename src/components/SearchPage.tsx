@@ -25,7 +25,7 @@ const SearchPage = () => {
   const [selectedFormation, setSelectedFormation] = useState<string | null>(
     null
   );
-  const [isPlaying, setIsPlaying] = useState(false);
+  const [isPlaying, setIsPlaying] = useState(true);
   const [isDragging, setIsDragging] = useState(false);
   const [dragStartY, setDragStartY] = useState<number | null>(null);
   const [dragMoved, setDragMoved] = useState(false);

@@ -13,7 +13,7 @@ const HomeFeed = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [plays, setPlays] = useState<Play[]>([]);
   const [loading, setLoading] = useState(true);
-  const [isPlaying, setIsPlaying] = useState(false);
+  const [isPlaying, setIsPlaying] = useState(true);
   const [isDragging, setIsDragging] = useState(false);
   const [dragStartY, setDragStartY] = useState<number | null>(null);
   const [dragMoved, setDragMoved] = useState(false);

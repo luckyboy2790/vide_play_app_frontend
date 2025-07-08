@@ -15,7 +15,7 @@ const Playbook = () => {
 
   const [flattenedPlays, setFlattenedPlays] = useState<any[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [isPlaying, setIsPlaying] = useState(false);
+  const [isPlaying, setIsPlaying] = useState(true);
   const [isDragging, setIsDragging] = useState(false);
   const [dragStartX, setDragStartX] = useState<number | null>(null);
   const [dragMoved, setDragMoved] = useState(false);
@@ -205,7 +205,8 @@ const Playbook = () => {
 
   return (
     <div className="h-screen max-w-sm w-full mx-auto flex flex-col justify-start items-center overflow-hidden relative pt-20">
-      {selectedFormation !== null && selectedFormation !== "" ? (
+      {(selectedFormation !== null && selectedFormation !== "") ||
+      (selectedPlayType !== null && selectedPlayType !== "") ? (
         <div className="relative overflow-hidden w-full h-full flex flex-col justify-between items-center">
           {selectedFormation && (
             <div className="z-50">
@@ -309,7 +310,7 @@ const Playbook = () => {
             >
               <ReactPlayer
                 url={playOfDay?.video_url}
-                playing={false}
+                playing={true}
                 controls={false}
                 muted={false}
                 loop
@@ -386,13 +387,11 @@ const Playbook = () => {
                     if (dropdownType === "formation") {
                       setSelectedFormation("");
 
-                      setSelectedPlayType("");
-
-                      fetchPlays("", "");
+                      fetchPlays("", selectedPlayType || "");
                     } else if (dropdownType === "playType") {
                       setSelectedPlayType("");
 
-                      fetchPlays(selectedFormation, "");
+                      fetchPlays(selectedFormation || "", "");
                     }
                     return;
                   }
@@ -402,9 +401,7 @@ const Playbook = () => {
                     fetchPlays(value, selectedPlayType || "");
                   } else if (dropdownType === "playType") {
                     setSelectedPlayType(value);
-                    if (selectedFormation) {
-                      fetchPlays(selectedFormation, value);
-                    }
+                    fetchPlays(selectedFormation || "", value);
                   }
                 }}
               >
