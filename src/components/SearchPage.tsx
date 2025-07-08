@@ -14,16 +14,13 @@ const API_URL = import.meta.env.VITE_BACKEND_URL;
 
 const SearchPage = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [dropdownType, setDropdownType] = useState<
-    "formation" | "playType" | null
-  >(null);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const [plays, setPlays] = useState<Play[]>([]);
   const [modalOpen, setModalOpen] = useState(false);
   const [selectedFormation, setSelectedFormation] = useState<string | null>(
     null
   );
-  const [isPlaying, setIsPlaying] = useState(true);
+  const [isPlaying, setIsPlaying] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
   const [dragStartY, setDragStartY] = useState<number | null>(null);
   const [dragMoved, setDragMoved] = useState(false);
@@ -84,10 +81,6 @@ const SearchPage = () => {
     }
   };
 
-  useEffect(() => {
-    fetchPlays(selectedFormation, selectedPlayType);
-  }, [selectedFormation, selectedPlayType]);
-
   const handleSwipe = (direction: "up" | "down") => {
     setIsPlaying(false);
     if (direction === "up" && currentIndex < plays.length - 1) {
@@ -144,16 +137,6 @@ const SearchPage = () => {
 
   const currentPlay = plays[currentIndex];
 
-  if (loading) {
-    return (
-      <div className="h-full flex items-center justify-center bg-black">
-        <div className="text-white text-center">
-          <p className="text-lg">Loading plays...</p>
-        </div>
-      </div>
-    );
-  }
-
   return (
     <div className="h-screen max-w-sm w-full mx-auto flex flex-col justify-start items-center overflow-hidden relative">
       <div className="flex justify-center items-center gap-4 p-2 w-full absolute top-20 z-50">
@@ -177,6 +160,13 @@ const SearchPage = () => {
 
       <div className="h-screen w-full flex flex-col gap-3 justify-center items-center">
         <div className="w-full h-full relative flex items-center justify-center">
+          {!selectedFormation && !selectedPlayType && !loading && (
+            <div className="h-full flex items-center justify-center bg-black">
+              <p className="text-white text-center text-lg">
+                Please apply filters to view plays.
+              </p>
+            </div>
+          )}
           <div
             ref={scrollContainerRef}
             className="h-screen w-full overflow-y-auto hide-scrollbar snap-y snap-mandatory"
