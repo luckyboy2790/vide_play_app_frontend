@@ -2,13 +2,9 @@ import { useState, useEffect, useRef } from "react";
 import { useCookies } from "react-cookie";
 import { useToast } from "@/hooks/use-toast";
 import ReactPlayer from "react-player";
-import { playTypes, formations } from "@/constants/playOptions";
 import FilterModal from "@/components/FilterModal";
-import { open } from "fs";
 
 const API_URL = import.meta.env.VITE_BACKEND_URL;
-
-const IMG_URL = import.meta.env.VITE_IMAGE_URL;
 
 const Playbook = () => {
   const [loading, setLoading] = useState(false);
@@ -167,18 +163,6 @@ const Playbook = () => {
       {(selectedFormation !== null && selectedFormation !== "") ||
       (selectedPlayType !== null && selectedPlayType !== "") ? (
         <div className="relative overflow-hidden w-full h-full flex flex-col justify-between items-center">
-          {selectedFormation && (
-            <div className="z-50">
-              <img
-                src={`${IMG_URL}/formation-diagrams/${selectedFormation}.png`}
-                alt="Formation Diagram"
-                width="100%"
-                height="auto"
-                style={{ objectFit: "contain" }}
-              />
-            </div>
-          )}
-
           <div
             ref={scrollContainerRef}
             className={`flex flex-1 w-full overflow-x-auto hide-scrollbar snap-x snap-mandatory ${
