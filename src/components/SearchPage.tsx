@@ -1,9 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
-import { Search } from "lucide-react";
-import { Input } from "@/components/ui/input";
-import SearchHeader from "./SearchHeader";
-import SearchBySection from "./SearchBySection";
-import { playTypes, formations } from "@/constants/playOptions";
+import { useEffect, useRef, useState } from "react";
 import { Play } from "@/types/play";
 import { useCookies } from "react-cookie";
 import { useToast } from "@/hooks/use-toast";
@@ -21,7 +16,6 @@ const SearchPage = () => {
     null
   );
   const [isPlaying, setIsPlaying] = useState(false);
-  const [isDragging, setIsDragging] = useState(false);
   const [dragStartY, setDragStartY] = useState<number | null>(null);
   const [dragMoved, setDragMoved] = useState(false);
   const [selectedPlayType, setSelectedPlayType] = useState<string | null>(null);
@@ -179,7 +173,6 @@ const SearchPage = () => {
                   onPointerDown={(e) => {
                     setDragStartY(e.clientY);
                     setDragMoved(false);
-                    setIsDragging(true);
                   }}
                   onPointerMove={(e) => {
                     if (dragStartY !== null && !dragMoved) {
@@ -194,7 +187,6 @@ const SearchPage = () => {
                   onPointerUp={() => {
                     setDragStartY(null);
                     setDragMoved(false);
-                    setIsDragging(false);
                   }}
                 >
                   <div className="text-white text-center max-w-md w-full h-full">

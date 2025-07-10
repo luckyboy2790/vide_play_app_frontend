@@ -14,7 +14,6 @@ const HomeFeed = () => {
   const [plays, setPlays] = useState<Play[]>([]);
   const [loading, setLoading] = useState(true);
   const [isPlaying, setIsPlaying] = useState(true);
-  const [isDragging, setIsDragging] = useState(false);
   const [dragStartY, setDragStartY] = useState<number | null>(null);
   const [dragMoved, setDragMoved] = useState(false);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
@@ -161,6 +160,50 @@ const HomeFeed = () => {
     }
   };
 
+  const currentPlay = plays[currentIndex];
+
+  const handleTouchStart = (e: React.TouchEvent) => {
+    setDragStartY(e.touches[0].clientY);
+    setDragMoved(false);
+  };
+
+  const handleTouchMove = (e: React.TouchEvent) => {
+    if (dragStartY !== null && !dragMoved) {
+      const deltaY = e.touches[0].clientY - dragStartY;
+      if (Math.abs(deltaY) > 50) {
+        if (deltaY > 0) handleSwipe("down");
+        else handleSwipe("up");
+        setDragMoved(true);
+      }
+    }
+  };
+
+  const handleTouchEnd = () => {
+    setDragStartY(null);
+    setDragMoved(false);
+  };
+
+  const handlePointerDown = (e: React.PointerEvent) => {
+    setDragStartY(e.clientY);
+    setDragMoved(false);
+  };
+
+  const handlePointerMove = (e: React.PointerEvent) => {
+    if (dragStartY !== null && !dragMoved) {
+      const deltaY = e.clientY - dragStartY;
+      if (Math.abs(deltaY) > 50) {
+        if (deltaY > 0) handleSwipe("down");
+        else handleSwipe("up");
+        setDragMoved(true);
+      }
+    }
+  };
+
+  const handlePointerUp = () => {
+    setDragStartY(null);
+    setDragMoved(false);
+  };
+
   if (loading) {
     return (
       <div className="h-full flex items-center justify-center bg-black">
@@ -171,45 +214,9 @@ const HomeFeed = () => {
     );
   }
 
-  if (plays.length === 0) {
-    return (
-      <div className="flex flex-col h-full">
-        <header className="z-20 px-4 py-3 bg-transparent">
-          <div className="flex justify-between items-center">
-            <div className="flex-1 flex justify-center">
-              <button className="text-white font-bold text-lg border-b-2 border-white pb-1">
-                Home Page
-              </button>
-            </div>
-            <button
-              onClick={() => navigate("/shared-play-preview")}
-              className="w-10 h-10 bg-green-600 hover:bg-green-700 text-white rounded-full shadow-lg flex items-center justify-center transition-colors opacity-80"
-            >
-              <Plus size={18} />
-            </button>
-          </div>
-        </header>
-        <div className="h-full flex items-center justify-center bg-black">
-          <div className="text-white text-center">
-            <p className="text-lg">No plays available</p>
-            <p className="text-sm opacity-75 mt-2">
-              Create your first play to get started!
-            </p>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  const currentPlay = plays[currentIndex];
-
   return (
-    <div
-      className={`relative h-full overflow-hidden bg-black ${
-        isDragging ? "select-none" : ""
-      }`}
-    >
-      <header className="absolute top-0 left-0 right-0 z-20 px-4 py-3 bg-transparent">
+    <div className={`relative h-full overflow-hidden bg-black`}>
+      <header className="z-20 px-4 py-3 bg-transparent absolute w-full top-0 left-0">
         <div className="flex justify-between items-center">
           <div className="flex-1 flex justify-center">
             <button className="text-white font-bold text-lg border-b-2 border-white pb-1">
@@ -225,72 +232,69 @@ const HomeFeed = () => {
         </div>
       </header>
 
-      <div className="h-full flex flex-col gap-3 justify-center items-center">
-        <div className="w-full h-full bg-gradient-to-b from-gray-800 to-gray-900 relative flex items-center justify-center">
-          <div
-            ref={scrollContainerRef}
-            className="h-screen w-full overflow-y-auto hide-scrollbar snap-y snap-mandatory"
-          >
-            {plays.map((play, index) => (
-              <div
-                key={play.id}
-                className="w-full h-screen snap-start flex relative justify-center items-center"
-                onPointerDown={(e) => {
-                  setDragStartY(e.clientY);
-                  setDragMoved(false);
-                  setIsDragging(true);
-                }}
-                onPointerMove={(e) => {
-                  if (dragStartY !== null && !dragMoved) {
-                    const deltaY = e.clientY - dragStartY;
-                    if (Math.abs(deltaY) > 50) {
-                      if (deltaY > 0) handleSwipe("down");
-                      else handleSwipe("up");
-                      setDragMoved(true);
-                    }
-                  }
-                }}
-                onPointerUp={() => {
-                  setDragStartY(null);
-                  setDragMoved(false);
-                  setIsDragging(false);
-                }}
-              >
-                <div className="text-white text-center max-w-md w-full h-full">
-                  <div className="relative w-full h-full overflow-hidden">
-                    <div
-                      className={`absolute top-0 left-0 w-full h-full transition-opacity duration-700 ease-in-out ${
-                        index === currentIndex
-                          ? "opacity-100 z-10"
-                          : "opacity-0 z-0 pointer-events-none"
-                      }`}
-                    >
-                      {index === currentIndex && (
-                        <ReactPlayer
-                          url={play.video_url}
-                          playing={isPlaying}
-                          loop
-                          controls={false}
-                          muted={false}
-                          width="100%"
-                          height="100%"
-                          style={{
-                            position: "absolute",
-                            top: 0,
-                            left: 0,
-                            objectFit: "cover",
-                          }}
-                          onClick={() => setIsPlaying((prev) => !prev)}
-                        />
-                      )}
-                    </div>
-                  </div>
+      <div
+        ref={scrollContainerRef}
+        className="h-screen w-full overflow-y-auto hide-scrollbar snap-y snap-mandatory"
+        onTouchStart={handleTouchStart}
+        onTouchMove={handleTouchMove}
+        onTouchEnd={handleTouchEnd}
+        onPointerDown={handlePointerDown}
+        onPointerMove={handlePointerMove}
+        onPointerUp={handlePointerUp}
+      >
+        {plays.length > 0 ? (
+          plays.map((play, index) => (
+            <div
+              key={play.id}
+              className="w-full h-screen snap-start flex relative justify-center items-center"
+            >
+              <div className="relative w-full h-full overflow-hidden">
+                <div
+                  className={`absolute top-0 left-0 w-full h-full transition-opacity duration-700 ease-in-out ${
+                    index === currentIndex
+                      ? "opacity-100 z-10"
+                      : "opacity-0 z-0 pointer-events-none"
+                  }`}
+                >
+                  {index === currentIndex && (
+                    <ReactPlayer
+                      url={play.video_url}
+                      playing={isPlaying}
+                      loop
+                      controls={false}
+                      muted={false}
+                      width="100%"
+                      height="100%"
+                      style={{
+                        position: "absolute",
+                        top: 0,
+                        left: 0,
+                        objectFit: "cover",
+                      }}
+                      onClick={() => {
+                        setIsPlaying((prev) => !prev);
+                      }}
+                    />
+                  )}
                 </div>
               </div>
-            ))}
+            </div>
+          ))
+        ) : (
+          <div className="flex flex-col h-full">
+            <div className="h-full flex items-center justify-center bg-black">
+              <div className="text-white text-center">
+                <p className="text-lg">No plays available</p>
+                <p className="text-sm opacity-75 mt-2">
+                  Create your first play to get started!
+                </p>
+              </div>
+            </div>
           </div>
-        </div>
+        )}
+      </div>
 
+      {currentPlay && (
         <div className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black/80 to-transparent z-50">
           <div
             className="absolute w-10 h-10 right-1 z-50 top-5"
@@ -325,22 +329,22 @@ const HomeFeed = () => {
                 <div className="w-2 h-2 bg-black rounded-full"></div>
               </div>
               <span className="text-white text-sm">
-                Original sound - {currentPlay.source}
+                Original sound - {currentPlay?.source}
               </span>
             </div>
           </div>
         </div>
+      )}
 
-        <div className="absolute right-2 top-1/2 transform -translate-y-1/2 flex flex-col gap-1 z-30">
-          {plays.map((_, tapIndex) => (
-            <div
-              key={tapIndex}
-              className={`w-1 h-4 rounded-full transition-colors ${
-                tapIndex === currentIndex ? "bg-white" : "bg-white/30"
-              }`}
-            />
-          ))}
-        </div>
+      <div className="absolute right-2 top-1/2 transform -translate-y-1/2 flex flex-col gap-1 z-30">
+        {plays.map((_, tapIndex) => (
+          <div
+            key={tapIndex}
+            className={`w-1 h-4 rounded-full transition-colors ${
+              tapIndex === currentIndex ? "bg-white" : "bg-white/30"
+            }`}
+          />
+        ))}
       </div>
     </div>
   );
