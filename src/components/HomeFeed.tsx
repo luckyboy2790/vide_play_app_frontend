@@ -206,7 +206,7 @@ const HomeFeed = () => {
 
   if (loading) {
     return (
-      <div className="h-full flex items-center justify-center bg-black">
+      <div className="h-full flex items-center justify-center bg-gradient-to-b from-gray-800 to-gray-900">
         <div className="text-white text-center">
           <p className="text-lg">Loading plays...</p>
         </div>
@@ -215,7 +215,9 @@ const HomeFeed = () => {
   }
 
   return (
-    <div className={`relative h-full overflow-hidden bg-black`}>
+    <div
+      className={`relative h-full overflow-hidden bg-gradient-to-b from-gray-800 to-gray-900`}
+    >
       <header className="z-20 px-4 py-3 bg-transparent absolute w-full top-0 left-0">
         <div className="flex justify-between items-center">
           <div className="flex-1 flex justify-center">
